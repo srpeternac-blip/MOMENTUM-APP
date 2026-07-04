@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOMENTUM APP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0C0F14; --panel:#131822; --panel2:#0F141D; --line:#202938;
+  --ink:#DCE4EE; --ink2:#8291A6; --ink3:#5A6779;
+  --amber:#FFB224; --green:#2FD073; --red:#FF5C5C; --warn:#FFC53D; --blue:#4DA3FF;
+  --disp:'Saira Condensed',sans-serif; --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;min-height:100vh}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+/* ---------- Cabecera ---------- */
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 20px;background:rgba(12,15,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{font-family:var(--disp);font-weight:800;font-size:28px;letter-spacing:.12em;text-transform:uppercase}
+.brand em{color:var(--amber);font-style:normal}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.chip{font-family:var(--mono);font-size:11px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;color:var(--ink2)}
+.chip.ok{color:var(--green);border-color:rgba(47,208,115,.4)}
+.chip.err{color:var(--red);border-color:rgba(255,92,92,.4)}
+.icon-btn{background:var(--panel);border:1px solid var(--line);color:var(--ink2);border-radius:8px;padding:6px 10px;font-size:14px}
+.icon-btn:hover{color:var(--ink);border-color:var(--ink3)}
+
+main{max-width:1080px;margin:0 auto;padding:24px 16px 80px}
+
+/* ---------- Secciones ---------- */
+.sec-title{font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin:34px 0 12px;display:flex;align-items:center;gap:10px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--line)}
+.sec-title .btn-mini{letter-spacing:0;text-transform:none}
+
+/* ---------- Panel de entorno ---------- */
+.env-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h3{font-family:var(--disp);font-size:15px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px}
+.semaforo{display:flex;align-items:center;gap:12px}
+.dot{width:16px;height:16px;border-radius:50%;flex:none;box-shadow:0 0 12px currentColor}
+.dot.green{background:var(--green);color:var(--green)}
+.dot.red{background:var(--red);color:var(--red)}
+.dot.grey{background:var(--ink3);color:transparent}
+.big-line{font-family:var(--mono);font-size:15px;font-weight:600}
+.sub-line{font-family:var(--mono);font-size:12px;color:var(--ink2);margin-top:6px}
+.vs-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.vs-row:last-child{border-bottom:0}
+.pos{color:var(--green)} .neg{color:var(--red)}
+.sector-row{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;padding:4px 0}
+.sector-row .bar{flex:1;height:5px;background:var(--panel2);border-radius:3px;overflow:hidden}
+.sector-row .bar i{display:block;height:100%;background:var(--amber)}
+.tag{font-size:10px;padding:1px 6px;border-radius:4px;font-family:var(--mono);flex:none}
+.tag.fav{background:rgba(47,208,115,.12);color:var(--green)}
+.tag.avoid{background:rgba(255,92,92,.12);color:var(--red)}
+.tag.neu{background:rgba(130,145,166,.12);color:var(--ink2)}
+
+/* ---------- Buscador ---------- */
+.search-wrap{display:flex;gap:10px;margin-top:6px}
+.search-wrap input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-family:var(--mono);font-size:17px;padding:13px 16px;text-transform:uppercase}
+.search-wrap input::placeholder{color:var(--ink3);text-transform:none;font-family:var(--sans);font-size:15px}
+.btn{background:var(--amber);color:#14100A;border:0;border-radius:10px;font-weight:600;font-size:15px;padding:0 24px}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn-mini{background:var(--panel);border:1px solid var(--line);color:var(--ink2);border-radius:7px;font-size:12px;padding:4px 10px}
+.btn-mini:hover{color:var(--ink);border-color:var(--ink3)}
+
+.notice{margin-top:12px;padding:10px 14px;border-radius:10px;font-size:13.5px;display:none}
+.notice.err{display:block;background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.3);color:#ffb3b3}
+.notice.info{display:block;background:rgba(77,163,255,.08);border:1px solid rgba(77,163,255,.3);color:#a8cdf5}
+
+/* ---------- Resultado ---------- */
+#resultado{display:none}
+.res-head{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+@media(max-width:640px){.res-head{grid-template-columns:1fr}}
+.company-name{font-family:var(--disp);font-size:26px;font-weight:700;letter-spacing:.03em}
+.company-name span{color:var(--amber);font-family:var(--mono);font-size:16px;margin-left:8px}
+.price-line{font-family:var(--mono);font-size:15px;margin-top:2px}
+.desc{color:var(--ink2);font-size:13.5px;margin-top:10px;max-width:640px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.links{margin-top:10px;font-size:13px;display:flex;gap:14px;flex-wrap:wrap}
+
+.score-box{text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 22px;min-width:180px}
+.dial{position:relative;width:120px;height:120px;margin:0 auto}
+.dial svg{transform:rotate(-90deg)}
+.dial .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono)}
+.dial .num b{font-size:30px;font-weight:600}
+.dial .num small{font-size:10px;color:var(--ink2)}
+.verdict{font-family:var(--disp);font-size:21px;font-weight:800;letter-spacing:.1em;margin-top:8px}
+.verdict.apta{color:var(--green)} .verdict.vigilar{color:var(--warn)} .verdict.descartar{color:var(--red)}
+.verdict-note{font-size:12px;color:var(--ink2);margin-top:2px}
+
+.env-warning{margin:14px 0 0;padding:9px 14px;border-radius:10px;background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.3);color:#ffb3b3;font-size:13px}
+
+/* ---------- Tabla de criterios ---------- */
+.crit-group{margin-top:18px}
+.crit-group h4{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.crit{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:baseline;padding:8px 10px;border-bottom:1px solid var(--panel2);font-size:14px}
+.crit:nth-child(even){background:rgba(255,255,255,.015)}
+.crit .mark{font-size:15px;font-family:var(--mono)}
+.mark.ok{color:var(--green)} .mark.ko{color:var(--red)} .mark.mid{color:var(--warn)} .mark.nd{color:var(--ink3)}
+.crit .lbl{color:var(--ink)}
+.crit .lbl small{display:block;color:var(--ink3);font-size:12px}
+.crit .val{font-family:var(--mono);font-size:13px;color:var(--ink2);text-align:right;white-space:nowrap}
+
+.list-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.btn-list{border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:14px;padding:9px 16px}
+.btn-list:hover{border-color:var(--ink3)}
+.btn-list.g:hover{border-color:var(--green);color:var(--green)}
+.btn-list.y:hover{border-color:var(--warn);color:var(--warn)}
+.btn-list.r:hover{border-color:var(--red);color:var(--red)}
+
+/* ---------- Listas ---------- */
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{background:var(--panel);border:1px solid var(--line);color:var(--ink2);border-radius:8px 8px 0 0;padding:7px 16px;font-size:13.5px}
+.tab.active{color:var(--ink);border-bottom-color:var(--panel);background:var(--panel)}
+.tab .n{font-family:var(--mono);color:var(--amber);margin-left:5px}
+.list-panel{background:var(--panel);border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:8px 12px;min-height:70px}
+.list-row{display:grid;grid-template-columns:90px 1fr 60px 90px auto;gap:10px;align-items:center;padding:8px 4px;border-bottom:1px solid var(--panel2);font-size:13.5px}
+.list-row:last-child{border-bottom:0}
+.list-row .t{font-family:var(--mono);font-weight:600;color:var(--amber);cursor:pointer}
+.list-row .s{font-family:var(--mono)}
+.list-row .d{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+.list-row .acts{display:flex;gap:6px;justify-content:flex-end}
+.empty{color:var(--ink3);font-size:13px;padding:16px 4px}
+@media(max-width:640px){.list-row{grid-template-columns:70px 1fr auto}.list-row .s,.list-row .d{display:none}}
+
+/* ---------- Modal ajustes ---------- */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;max-width:520px;width:100%}
+.modal-box h3{font-family:var(--disp);font-size:19px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.modal-box p{font-size:13.5px;color:var(--ink2);margin-bottom:10px}
+.modal-box input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-family:var(--mono);font-size:13px;padding:10px 12px;margin-bottom:12px}
+.modal-foot{display:flex;gap:10px;justify-content:flex-end}
+
+.loading{display:inline-block;width:14px;height:14px;border:2px solid var(--ink3);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.loading{animation:none}}
+.skeleton{color:var(--ink3);font-family:var(--mono);font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">MOMENTUM<em>·</em>APP</div>
+  <div class="hdr-right">
+    <span class="chip" id="chipWorker">worker: —</span>
+    <button class="icon-btn" id="btnAjustes" title="Ajustes">⚙</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ENTORNO -->
+  <div class="sec-title">Entorno de mercado <button class="btn-mini" id="btnRefEnv">Actualizar</button></div>
+  <div class="env-grid">
+    <div class="card" id="cardSPX">
+      <h3>Filtro maestro · SP500 vs MM40 semanas</h3>
+      <div class="skeleton">Cargando…</div>
+    </div>
+    <div class="card" id="cardRisk">
+      <h3>Apetito por el riesgo · QQQ vs IWM</h3>
+      <div class="skeleton">Cargando…</div>
+    </div>
+    <div class="card" id="cardSectors">
+      <h3>Sectores · rendimiento 1m/3m</h3>
+      <div class="skeleton">Cargando…</div>
+    </div>
+  </div>
+
+  <!-- BUSCADOR -->
+  <div class="sec-title">Análisis de ticker</div>
+  <div class="search-wrap">
+    <input id="inpTicker" placeholder="Introduce un ticker (ej. NVDA, PLTR, CRWD) y pulsa Enter" autocomplete="off" spellcheck="false">
+    <button class="btn" id="btnAnalizar">Analizar</button>
+  </div>
+  <div class="notice" id="notice"></div>
+
+  <!-- RESULTADO -->
+  <section id="resultado">
+    <div class="env-warning" id="envWarning" style="display:none"></div>
+    <div class="res-head" style="margin-top:18px">
+      <div>
+        <div class="company-name" id="rName"></div>
+        <div class="price-line" id="rPrice"></div>
+        <div class="chips" id="rChips"></div>
+        <div class="desc" id="rDesc"></div>
+        <div class="links" id="rLinks"></div>
+      </div>
+      <div class="score-box">
+        <div class="dial">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#1B2230" stroke-width="10"/>
+            <circle id="dialArc" cx="60" cy="60" r="52" fill="none" stroke="#2FD073" stroke-width="10"
+              stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div class="num"><b id="dialNum">0</b><small>/ 100</small></div>
+        </div>
+        <div class="verdict" id="rVerdict"></div>
+        <div class="verdict-note" id="rVerdictNote"></div>
+      </div>
+    </div>
+
+    <div id="critContainer"></div>
+
+    <div class="list-actions">
+      <button class="btn-list g" data-list="aptas">＋ Aptas</button>
+      <button class="btn-list y" data-list="vigilancia">＋ Vigilancia</button>
+      <button class="btn-list r" data-list="descartadas">＋ Descartadas</button>
+    </div>
+  </section>
+
+  <!-- LISTAS -->
+  <div class="sec-title">Mis listas
+    <button class="btn-mini" id="btnExport">Exportar JSON</button>
+    <button class="btn-mini" id="btnImport">Importar</button>
+    <input type="file" id="fileImport" accept=".json" style="display:none">
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="list-panel" id="listPanel"></div>
+
+</main>
+
+<!-- MODAL AJUSTES -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3>Ajustes</h3>
+    <p>Pega aquí la URL de tu Cloudflare Worker (ej. <span style="font-family:var(--mono)">https://momentum.tuusuario.workers.dev</span>). Sin él la app no puede obtener datos. Los pasos de configuración están en la guía del repositorio.</p>
+    <input id="inpWorker" placeholder="https://....workers.dev">
+    <div class="modal-foot">
+      <button class="btn-mini" id="btnTestWorker">Probar conexión</button>
+      <button class="btn" id="btnSaveWorker" style="padding:8px 20px">Guardar</button>
+    </div>
+    <p id="testResult" style="margin-top:10px;margin-bottom:0"></p>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* =============== CONFIG Y HELPERS =============== */
+const LS_WORKER = 'momentum_worker_url';
+const LS_LISTS  = 'momentum_lists_v1';
+const $ = (s) => document.querySelector(s);
+
+let workerUrl = localStorage.getItem(LS_WORKER) || '';
+let spxDailyCache = null;      // cierres diarios del SP500 (para RS)
+let currentAnalysis = null;    // resultado del ticker actual
+let envState = { spxOk: null };
+
+const rv = (x) => (x && typeof x === 'object' && 'raw' in x) ? x.raw : (typeof x === 'number' ? x : null);
+const pct = (x, d=1) => x==null ? 'N/D' : (x*100).toFixed(d) + '%';
+const money = (x) => {
+  if (x==null) return 'N/D';
+  if (Math.abs(x) >= 1e12) return (x/1e12).toFixed(2)+' T$';
+  if (Math.abs(x) >= 1e9)  return (x/1e9).toFixed(2)+' B$';
+  if (Math.abs(x) >= 1e6)  return (x/1e6).toFixed(1)+' M$';
+  return x.toFixed(0)+' $';
+};
+const esc = (s) => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function api(path) {
+  if (!workerUrl) throw new Error('SIN_WORKER');
+  const r = await fetch(workerUrl.replace(/\/+$/,'') + path);
+  if (!r.ok) {
+    let msg = 'Error ' + r.status;
+    try { const j = await r.json(); if (j.error) msg += ': ' + j.error; } catch(e){}
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
+function parseChart(j) {
+  const res = j?.chart?.result?.[0];
+  if (!res) throw new Error('Sin datos de gráfico');
+  const q = res.indicators?.quote?.[0] || {};
+  const ts = res.timestamp || [];
+  const rows = [];
+  for (let i=0;i<ts.length;i++){
+    if (q.close?.[i]!=null) rows.push({t:ts[i], c:q.close[i], h:q.high?.[i]??q.close[i], v:q.volume?.[i]??0});
+  }
+  return { rows, meta: res.meta || {} };
+}
+const sma = (arr, n) => arr.length < n ? null : arr.slice(-n).reduce((a,b)=>a+b,0)/n;
+const perf = (closes, n) => {
+  if (closes.length <= n) return null;
+  const a = closes[closes.length-1-n], b = closes[closes.length-1];
+  return a ? (b/a - 1) : null;
+};
+
+function setNotice(type, html){ const n=$('#notice'); n.className='notice '+(type||''); n.innerHTML=html||''; if(!type) n.style.display='none'; }
+
+/* =============== ENTORNO =============== */
+const SECTORES = [
+  {s:'XLK',  n:'Tecnología',        tag:'fav'},
+  {s:'XLC',  n:'Comunicación',      tag:'fav'},
+  {s:'XLY',  n:'Consumo Discrec.',  tag:'fav'},
+  {s:'XLI',  n:'Industrial/Aero',   tag:'neu'},
+  {s:'XLV',  n:'Salud',             tag:'neu'},
+  {s:'XLE',  n:'Energía',           tag:'neu'},
+  {s:'XLRE', n:'Real Estate',       tag:'neu'},
+  {s:'XLF',  n:'Financiero',        tag:'avoid'},
+  {s:'XLB',  n:'Materiales',        tag:'avoid'},
+  {s:'XLU',  n:'Utilities',         tag:'avoid'},
+  {s:'XLP',  n:'Consumo Básico',    tag:'avoid'},
+];
+
+async function cargarEntorno(){
+  if (!workerUrl){ mostrarSinWorker(); return; }
+  $('#cardSPX').innerHTML = '<h3>Filtro maestro · SP500 vs MM40 semanas</h3><div class="skeleton">Cargando…</div>';
+  $('#cardRisk').innerHTML = '<h3>Apetito por el riesgo · QQQ vs IWM</h3><div class="skeleton">Cargando…</div>';
+  $('#cardSectors').innerHTML = '<h3>Sectores · rendimiento 1m/3m</h3><div class="skeleton">Cargando…</div>';
+
+  // --- SP500 semanal vs MM40s ---
+  api('/chart/%5EGSPC?range=3y&interval=1wk').then(j=>{
+    const {rows} = parseChart(j);
+    const closes = rows.map(r=>r.c);
+    const mm40 = sma(closes, 40);
+    const last = closes[closes.length-1];
+    const ok = mm40!=null && last > mm40;
+    envState.spxOk = ok;
+    const dist = mm40 ? (last/mm40-1) : null;
+    $('#cardSPX').innerHTML = `
+      <h3>Filtro maestro · SP500 vs MM40 semanas</h3>
+      <div class="semaforo">
+        <span class="dot ${ok?'green':'red'}"></span>
+        <div>
+          <div class="big-line">${ok?'ENTORNO FAVORABLE':'ENTORNO DESFAVORABLE'}</div>
+          <div class="sub-line">SPX ${last?last.toFixed(0):'—'} · MM40s ${mm40?mm40.toFixed(0):'—'} · ${dist!=null?(dist>0?'+':'')+pct(dist):''}</div>
+        </div>
+      </div>
+      <div class="sub-line" style="margin-top:10px">${ok?'Precio por encima de la media de 40 semanas: la estrategia momentum está habilitada.':'Precio bajo la MM40s: probabilidad de fallo elevada. Tu sistema dice NO operar momentum.'}</div>`;
+    actualizarWarning();
+  }).catch(e=>{ $('#cardSPX').innerHTML = '<h3>Filtro maestro · SP500 vs MM40 semanas</h3><div class="sub-line">Error: '+esc(e.message)+'</div>'; });
+
+  // --- QQQ vs IWM ---
+  Promise.all([api('/chart/QQQ?range=1y&interval=1d'), api('/chart/IWM?range=1y&interval=1d')]).then(([jq,ji])=>{
+    const cq = parseChart(jq).rows.map(r=>r.c);
+    const ci = parseChart(ji).rows.map(r=>r.c);
+    const q1=perf(cq,21), q3=perf(cq,63), i1=perf(ci,21), i3=perf(ci,63);
+    const lider = (q3??-9) >= (i3??-9) ? 'QQQ' : 'IWM';
+    const msg = lider==='QQQ'
+      ? 'Lidera el Nasdaq: fuerza en tecnología y growth.'
+      : 'Lidera el Russell: apetito por riesgo en mid/small caps.';
+    const fmt = (x)=> x==null?'N/D':`<span class="${x>=0?'pos':'neg'}">${(x>0?'+':'')+pct(x)}</span>`;
+    $('#cardRisk').innerHTML = `
+      <h3>Apetito por el riesgo · QQQ vs IWM</h3>
+      <div class="vs-row"><span>QQQ (Nasdaq) ${lider==='QQQ'?'★':''}</span><span>1m ${fmt(q1)} · 3m ${fmt(q3)}</span></div>
+      <div class="vs-row"><span>IWM (Russell) ${lider==='IWM'?'★':''}</span><span>1m ${fmt(i1)} · 3m ${fmt(i3)}</span></div>
+      <div class="sub-line" style="margin-top:8px">${msg}</div>`;
+  }).catch(e=>{ $('#cardRisk').innerHTML = '<h3>Apetito por el riesgo · QQQ vs IWM</h3><div class="sub-line">Error: '+esc(e.message)+'</div>'; });
+
+  // --- Sectores ---
+  Promise.all(SECTORES.map(x => api('/chart/'+x.s+'?range=6mo&interval=1d').then(j=>{
+    const c = parseChart(j).rows.map(r=>r.c);
+    return {...x, p1: perf(c,21), p3: perf(c,63)};
+  }).catch(()=>({...x,p1:null,p3:null})))).then(list=>{
+    list.sort((a,b)=> ((b.p3??-9)*0.5+(b.p1??-9)*0.5) - ((a.p3??-9)*0.5+(a.p1??-9)*0.5));
+    const max = Math.max(...list.map(x=>Math.abs(x.p3??0)), 0.01);
+    const tagTxt = {fav:'FAVORABLE', avoid:'EVITAR', neu:'—'};
+    $('#cardSectors').innerHTML = '<h3>Sectores · rendimiento 1m/3m</h3>' + list.slice(0,7).map(x=>`
+      <div class="sector-row">
+        <span style="width:118px;flex:none">${x.n}</span>
+        <span class="bar"><i style="width:${Math.min(100,Math.abs((x.p3??0)/max)*100)}%;background:${(x.p3??0)>=0?'var(--amber)':'var(--red)'}"></i></span>
+        <span style="width:52px;text-align:right" class="${(x.p3??0)>=0?'pos':'neg'}">${x.p3==null?'N/D':(x.p3>0?'+':'')+pct(x.p3,0)}</span>
+        <span class="tag ${x.tag}">${tagTxt[x.tag]}</span>
+      </div>`).join('') +
+      '<div class="sub-line" style="margin-top:8px">Ordenados por fuerza 3 meses. El sector más caliente marca la narrativa donde buscar líderes.</div>';
+  });
+}
+
+function actualizarWarning(){
+  const w = $('#envWarning');
+  if (envState.spxOk === false && currentAnalysis){
+    w.style.display='block';
+    w.textContent = '⚠ Filtro maestro en rojo: el SP500 está por debajo de su MM40 semanas. Tu sistema desaconseja abrir posiciones momentum aunque la empresa puntúe bien.';
+  } else { w.style.display='none'; }
+}
+
+function mostrarSinWorker(){
+  const html = '<div class="sub-line">Configura la URL de tu Worker en ⚙ Ajustes para cargar datos.</div>';
+  $('#cardSPX').innerHTML = '<h3>Filtro maestro · SP500 vs MM40 semanas</h3>'+html;
+  $('#cardRisk').innerHTML = '<h3>Apetito por el riesgo · QQQ vs IWM</h3>'+html;
+  $('#cardSectors').innerHTML = '<h3>Sectores · rendimiento 1m/3m</h3>'+html;
+}
+
+/* =============== ANÁLISIS DE TICKER =============== */
+const FAV_SECTORS = ['Technology','Communication Services','Consumer Cyclical'];
+const AVOID_SECTORS = ['Basic Materials','Utilities','Financial Services','Consumer Defensive','Real Estate'];
+const FAV_INDUSTRY_HINTS = ['Software','Semiconductor','Internet','Aerospace','Defense','Security','Payment','Information Technology','Solar','Electronic'];
+
+async function analizar(){
+  const t = $('#inpTicker').value.trim().toUpperCase();
+  if (!t) return;
+  if (!workerUrl){ abrirModal(); return; }
+  const btn = $('#btnAnalizar');
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span>';
+  setNotice('', '');
+  try {
+    const [sumJ, chJ] = await Promise.all([
+      api('/summary/'+encodeURIComponent(t)+'?modules=assetProfile,price,summaryDetail,defaultKeyStatistics,financialData,earningsTrend,majorHoldersBreakdown'),
+      api('/chart/'+encodeURIComponent(t)+'?range=2y&interval=1d'),
+    ]);
+    if (!spxDailyCache){
+      try { spxDailyCache = parseChart(await api('/chart/%5EGSPC?range=2y&interval=1d')).rows.map(r=>r.c); } catch(e){ spxDailyCache = null; }
+    }
+    const mods = sumJ?.quoteSummary?.result?.[0];
+    if (!mods) throw new Error('Ticker no encontrado o sin datos ("'+t+'")');
+    const chart = parseChart(chJ);
+    renderAnalisis(t, mods, chart);
+  } catch(e){
+    if (String(e.message)==='SIN_WORKER'){ abrirModal(); }
+    else setNotice('err', 'No se pudo analizar <b>'+esc(t)+'</b> — '+esc(e.message)+'. Comprueba el ticker o la conexión del Worker.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Analizar';
+  }
+}
+
+function calcRS(closes){
+  if (!closes || closes.length < 260 || !spxDailyCache || spxDailyCache.length < 260) return null;
+  const w = (c)=> 0.4*(perf(c,63)??0) + 0.2*(perf(c,126)??0) + 0.2*(perf(c,189)??0) + 0.2*(perf(c,252)??0);
+  const excess = w(closes) - w(spxDailyCache);
+  return { excess, rating: Math.max(1, Math.min(99, Math.round(55 + excess*150))) };
+}
+
+function renderAnalisis(t, m, chart){
+  const P = m.price||{}, SD = m.summaryDetail||{}, KS = m.defaultKeyStatistics||{}, FD = m.financialData||{},
+        AP = m.assetProfile||{}, MH = m.majorHoldersBreakdown||{}, ET = m.earningsTrend||{};
+
+  const closes = chart.rows.map(r=>r.c), vols = chart.rows.map(r=>r.v), highs = chart.rows.map(r=>r.h);
+  const price = rv(P.regularMarketPrice) ?? closes[closes.length-1];
+  const cap = rv(P.marketCap);
+  const beta = rv(SD.beta) ?? rv(KS.beta);
+  const shortPct = rv(KS.shortPercentOfFloat);
+  const instPct = rv(MH.institutionsPercentHeld) ?? rv(KS.heldPercentInstitutions);
+  const instCount = rv(MH.institutionsCount);
+  const roe = rv(FD.returnOnEquity);
+  const totalDebt = rv(FD.totalDebt), totalCash = rv(FD.totalCash), ebitda = rv(FD.ebitda);
+  const fcf = rv(FD.freeCashflow);
+  const revG = rv(FD.revenueGrowth);
+  const epsG = rv(KS.earningsQuarterlyGrowth) ?? rv(FD.earningsGrowth);
+  const trendNext = (ET.trend||[]).find(x=>x.period==='+1y') || {};
+  const guideEps = rv(trendNext.growth);
+  const guideRev = rv(trendNext.revenueEstimate?.growth);
+  const ipoTs = chart.meta.firstTradeDate; // epoch s
+  const ipoYears = ipoTs ? (Date.now()/1000 - ipoTs)/31557600 : null;
+  const sector = AP.sector||'', industry = AP.industry||'';
+  const isUS = !AP.country || AP.country==='United States';
+
+  // Técnico
+  const s50 = sma(closes,50), s150 = sma(closes,150), s200 = sma(closes,200);
+  const hi52 = highs.length>252 ? Math.max(...highs.slice(-252)) : Math.max(...highs);
+  const dist52 = hi52 ? (hi52-price)/hi52 : null;
+  const volAvg50 = sma(vols.slice(0,-0),50);
+  const lastVol = vols[vols.length-1];
+  const volRatio = volAvg50 ? lastVol/volAvg50 : null;
+  const rs = calcRS(closes);
+
+  // ---- Evaluación de criterios ----
+  // estado: 'ok' | 'mid' | 'ko' | 'nd'   puntos: peso * (ok=1, mid=0.5, ko=0)
+  const C = [];
+  const add = (grupo, peso, lbl, sub, val, estado) => C.push({grupo,peso,lbl,sub,val,estado});
+
+  // Sector
+  let sectEstado='mid', sectNote='Sector neutro para la estrategia';
+  const indHit = FAV_INDUSTRY_HINTS.some(h=>industry.includes(h));
+  if (FAV_SECTORS.includes(sector) || indHit){ sectEstado='ok'; sectNote='Sector/industria dentro de las narrativas favorables'; }
+  else if (AVOID_SECTORS.includes(sector)){ sectEstado='ko'; sectNote='Sector en tu lista de "evitar"'; }
+  else if (sector==='Healthcare' && industry.includes('Biotech')){ sectEstado='ko'; sectNote='Biotech especulativa: eventos binarios'; }
+  add('P', 10, 'Narrativa / sector', sectNote, sector + (industry?' · '+industry:''), sector?sectEstado:'nd');
+
+  // Ventas YoY
+  add('P', 15, 'Crecimiento de ventas (trimestre YoY)', 'Mínimo 20% · ideal ≥30% y acelerando',
+    pct(revG), revG==null?'nd' : revG>=0.20?'ok' : revG>=0.10?'mid':'ko');
+
+  // EPS YoY
+  add('P', 12, 'Crecimiento EPS (trimestre YoY)', 'Mínimo 20% o clara mejora progresiva',
+    pct(epsG), epsG==null?'nd' : epsG>=0.20?'ok' : epsG>=0?'mid':'ko');
+
+  // Técnico: cerca de máximos
+  add('P', 8, 'Distancia a máximos 52 semanas', 'Cerca de romper máximos (≤5% ideal)',
+    dist52==null?'N/D':'-'+pct(dist52), dist52==null?'nd' : dist52<=0.05?'ok' : dist52<=0.15?'mid':'ko');
+
+  // Técnico: medias móviles
+  let maEstado='nd', maVal='N/D';
+  if (s200!=null){
+    maVal = `50d ${s50?s50.toFixed(1):'—'} · 200d ${s200.toFixed(1)}`;
+    maEstado = (price>s50 && price>s200) ? 'ok' : (price>s200 ? 'mid' : 'ko');
+  }
+  add('P', 6, 'Estructura sobre medias (≈10/30/40 sem)', 'Precio por encima de las medias clave', maVal, maEstado);
+
+  // RS aprox
+  add('P', 4, 'Fuerza relativa vs SP500 (RS aprox.)', 'Aproximación calculada 3/6/9/12m · objetivo ≥80',
+    rs? rs.rating+' ('+(rs.excess>0?'+':'')+pct(rs.excess)+' vs SPX)':'N/D',
+    !rs?'nd' : rs.rating>=80?'ok' : rs.rating>=60?'mid':'ko');
+
+  // Claves
+  add('K', 7, 'Market cap', 'Ideal 2–40 B$ (1–2 B$ excepcional)',
+    money(cap), cap==null?'nd' : (cap>=2e9&&cap<=4e10)?'ok' : ((cap>=1e9&&cap<2e9)||(cap>4e10&&cap<=1e11))?'mid':'ko');
+
+  add('K', 5, 'Precio de la acción', '> 10$ (mínimo absoluto 7$)',
+    price!=null?price.toFixed(2)+' $':'N/D', price==null?'nd' : price>10?'ok' : price>=7?'mid':'ko');
+
+  add('K', 6, 'Antigüedad desde IPO', 'Preferencia ≤ 5–7 años (no descalifica)',
+    ipoYears!=null?ipoYears.toFixed(1)+' años':'N/D', ipoYears==null?'nd' : ipoYears<=7?'ok':'mid');
+
+  add('K', 6, 'Nº fondos institucionales', 'Mínimo 50 · líderes >500',
+    instCount!=null?instCount.toLocaleString('es-ES'):'N/D — verificar en Fintel',
+    instCount==null?'nd' : instCount>=50?'ok' : instCount>=25?'mid':'ko');
+
+  const guide = guideRev ?? guideEps;
+  add('K', 6, 'Guidance (+1 año)', 'Estimaciones creciendo ≥20%',
+    'Ventas '+pct(guideRev)+' · EPS '+pct(guideEps),
+    guide==null?'nd' : guide>=0.20?'ok' : guide>=0.10?'mid':'ko');
+
+  // Secundarios
+  add('S', 3, '% propiedad institucional', 'Entre 20% y 80–90%',
+    pct(instPct), instPct==null?'nd' : (instPct>=0.20&&instPct<=0.90)?'ok' : (instPct>=0.10&&instPct<=0.95)?'mid':'ko');
+
+  add('S', 3, 'Short interest (% float)', '0–5% neutro · 5–15% interesante · >15% combustible',
+    pct(shortPct), shortPct==null?'nd' : shortPct>0.05?'ok':'mid');
+
+  add('S', 3, 'ROE', '≥10% razonable · ≥15% excelente · negativo solo con ventas explosivas',
+    pct(roe), roe==null?'nd' : roe>=0.10?'ok' : (roe<0 && (revG??0)>=0.30)?'mid' : roe>=0?'mid':'ko');
+
+  let debtEstado='nd', debtVal='N/D';
+  if (totalDebt!=null && totalCash!=null){
+    debtVal = 'Deuda '+money(totalDebt)+' · Caja '+money(totalCash);
+    if (totalDebt <= 0.5*totalCash) debtEstado='ok';
+    else if (ebitda && ebitda>0 && (totalDebt-totalCash)/ebitda < 4.5) debtEstado='mid';
+    else debtEstado='ko';
+  }
+  add('S', 3, 'Deuda vs caja', 'Deuda ≤ 50% de la caja · Net Debt/EBITDA < 4.5', debtVal, debtEstado);
+
+  add('S', 3, 'Free Cash Flow', 'Positivo (negativo tolerable en empresas jóvenes en expansión)',
+    money(fcf), fcf==null?'nd' : fcf>=0?'ok' : (ipoYears!=null&&ipoYears<=7)?'mid':'ko');
+
+  add('S', 3, 'Beta', 'Entre 1.2 y 2.5',
+    beta!=null?beta.toFixed(2):'N/D', beta==null?'nd' : (beta>=1.2&&beta<=2.5)?'ok' : (beta>=0.9&&beta<=3)?'mid':'ko');
+
+  // ADR (informativo, no puntúa)
+  if (!isUS) add('K', 0, 'Posible ADR', 'Sede fuera de EE. UU.: muchos fondos lo tienen vetado', AP.country||'', 'mid');
+
+  // ---- Puntuación ----
+  let earned=0, possible=0;
+  for (const c of C){
+    if (c.estado==='nd' || c.peso===0) continue;
+    possible += c.peso;
+    earned += c.peso * (c.estado==='ok'?1 : c.estado==='mid'?0.5 : 0);
+  }
+  const score = possible? Math.round(100*earned/possible) : 0;
+  const ventasKO = C.find(c=>c.lbl.startsWith('Crecimiento de ventas'))?.estado==='ko';
+  const epsKO = C.find(c=>c.lbl.startsWith('Crecimiento EPS'))?.estado==='ko';
+  let verdict, vClass, vNote='';
+  if (ventasKO && epsKO){ verdict='DESCARTAR'; vClass='descartar'; vNote='Sin motor: ventas y EPS fuera de rango'; }
+  else if (score>=70){ verdict='APTA'; vClass='apta'; vNote='Cumple el sistema · confirmar patrón y volumen en el gráfico'; }
+  else if (score>=45){ verdict='VIGILAR'; vClass='vigilar'; vNote='Potencial con carencias · seguir de cerca'; }
+  else { verdict='DESCARTAR'; vClass='descartar'; vNote='No cumple los criterios del sistema'; }
+
+  // ---- Render ----
+  currentAnalysis = { t, name: P.shortName||P.longName||t, score, verdict, date: new Date().toISOString().slice(0,10) };
+  $('#rName').innerHTML = esc(P.shortName||P.longName||t) + '<span>'+esc(t)+'</span>';
+  const chg = rv(P.regularMarketChangePercent);
+  $('#rPrice').innerHTML = (price!=null?price.toFixed(2)+' $ ':'') +
+    (chg!=null?`<span class="${chg>=0?'pos':'neg'}">${(chg>0?'+':'')+pct(chg)}</span>`:'') +
+    (cap!=null?' · '+money(cap):'') +
+    (volRatio!=null?` · Vol hoy ${volRatio.toFixed(2)}× media 50d`:'');
+  $('#rChips').innerHTML =
+    (sector?`<span class="chip">${esc(sector)}</span>`:'') +
+    (industry?`<span class="chip">${esc(industry)}</span>`:'') +
+    (AP.country?`<span class="chip">${esc(AP.country)}</span>`:'') +
+    (ipoYears!=null?`<span class="chip">IPO hace ${ipoYears.toFixed(1)} años</span>`:'');
+  const summary = AP.longBusinessSummary || '';
+  $('#rDesc').textContent = summary ? summary.split('. ').slice(0,2).join('. ') + '.' : 'Sin descripción disponible.';
+  $('#rLinks').innerHTML = `
+    <a href="https://fintel.io/s/us/${t.toLowerCase()}" target="_blank" rel="noopener">Fintel (fondos/short) ↗</a>
+    <a href="https://www.marketbeat.com/stocks/search/?query=${t}" target="_blank" rel="noopener">MarketBeat ↗</a>
+    <a href="https://finance.yahoo.com/quote/${t}" target="_blank" rel="noopener">Yahoo Finance ↗</a>`;
+
+  // Dial
+  const circ = 2*Math.PI*52;
+  const arc = $('#dialArc');
+  arc.style.strokeDashoffset = circ*(1-score/100);
+  arc.setAttribute('stroke', score>=70?'#2FD073':score>=45?'#FFC53D':'#FF5C5C');
+  $('#dialNum').textContent = score;
+  $('#rVerdict').textContent = verdict; $('#rVerdict').className = 'verdict '+vClass;
+  $('#rVerdictNote').textContent = vNote;
+
+  // Criterios
+  const mark = {ok:'✔', mid:'⚠', ko:'✘', nd:'·'};
+  const grupos = [['P','Prioridad absoluta'],['K','Claves importantes'],['S','Secundarios / desempate']];
+  $('#critContainer').innerHTML = grupos.map(([g,titulo])=>{
+    const rows = C.filter(c=>c.grupo===g);
+    if (!rows.length) return '';
+    return `<div class="crit-group"><h4>${titulo}</h4>` + rows.map(c=>`
+      <div class="crit">
+        <span class="mark ${c.estado}">${mark[c.estado]}</span>
+        <span class="lbl">${esc(c.lbl)}<small>${esc(c.sub)}</small></span>
+        <span class="val">${esc(c.val)}</span>
+      </div>`).join('') + '</div>';
+  }).join('');
+
+  $('#resultado').style.display='block';
+  actualizarWarning();
+  $('#resultado').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* =============== LISTAS =============== */
+const LISTAS = [['aptas','Aptas'],['vigilancia','Vigilancia'],['descartadas','Descartadas']];
+let activeTab = 'aptas';
+
+function getLists(){
+  try { const j = JSON.parse(localStorage.getItem(LS_LISTS)||'{}');
+    return { aptas: j.aptas||[], vigilancia: j.vigilancia||[], descartadas: j.descartadas||[] };
+  } catch(e){ return {aptas:[],vigilancia:[],descartadas:[]}; }
+}
+function saveLists(l){ localStorage.setItem(LS_LISTS, JSON.stringify(l)); renderLists(); }
+
+function addToList(listKey, entry){
+  const l = getLists();
+  for (const k of Object.keys(l)) l[k] = l[k].filter(x=>x.t!==entry.t); // mover, no duplicar
+  l[listKey].unshift(entry);
+  saveLists(l);
+  activeTab = listKey; renderLists();
+  setNotice('info', '<b>'+esc(entry.t)+'</b> guardado en <b>'+esc(LISTAS.find(x=>x[0]===listKey)[1])+'</b>.');
+  setTimeout(()=>setNotice('',''), 2500);
+}
+
+function renderLists(){
+  const l = getLists();
+  $('#tabs').innerHTML = LISTAS.map(([k,n])=>
+    `<button class="tab ${k===activeTab?'active':''}" data-tab="${k}">${n}<span class="n">${l[k].length}</span></button>`).join('');
+  const rows = l[activeTab];
+  $('#listPanel').innerHTML = rows.length ? rows.map((x,i)=>`
+    <div class="list-row">
+      <span class="t" data-t="${esc(x.t)}" title="Reanalizar">${esc(x.t)}</span>
+      <span>${esc(x.name||'')}</span>
+      <span class="s">${x.score!=null?x.score:'—'}</span>
+      <span class="d">${esc(x.date||'')}</span>
+      <span class="acts">
+        ${LISTAS.filter(([k])=>k!==activeTab).map(([k,n])=>`<button class="btn-mini" data-move="${k}" data-i="${i}">→ ${n}</button>`).join('')}
+        <button class="btn-mini" data-del="${i}" title="Eliminar">✕</button>
+      </span>
+    </div>`).join('') : '<div class="empty">Lista vacía. Analiza un ticker y guárdalo aquí.</div>';
+}
+
+$('#tabs').addEventListener('click', e=>{
+  const t = e.target.closest('.tab'); if (!t) return;
+  activeTab = t.dataset.tab; renderLists();
+});
+$('#listPanel').addEventListener('click', e=>{
+  const l = getLists();
+  const del = e.target.closest('[data-del]');
+  const mov = e.target.closest('[data-move]');
+  const tk  = e.target.closest('[data-t]');
+  if (del){ l[activeTab].splice(+del.dataset.del,1); saveLists(l); }
+  else if (mov){ const item = l[activeTab].splice(+mov.dataset.i,1)[0]; l[mov.dataset.move].unshift(item); saveLists(l); }
+  else if (tk){ $('#inpTicker').value = tk.dataset.t; analizar(); }
+});
+
+$('#btnExport').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(getLists(),null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'momentum_listas_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+});
+$('#btnImport').addEventListener('click', ()=>$('#fileImport').click());
+$('#fileImport').addEventListener('change', e=>{
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{ try{
+      const j = JSON.parse(r.result);
+      if (!j.aptas && !j.vigilancia && !j.descartadas) throw new Error('formato no válido');
+      saveLists({aptas:j.aptas||[], vigilancia:j.vigilancia||[], descartadas:j.descartadas||[]});
+      setNotice('info','Listas importadas correctamente.'); setTimeout(()=>setNotice('',''),2500);
+    } catch(err){ setNotice('err','No se pudo importar: '+esc(err.message)); } };
+  r.readAsText(f); e.target.value='';
+});
+
+document.querySelectorAll('.btn-list').forEach(b=>b.addEventListener('click', ()=>{
+  if (!currentAnalysis) return;
+  addToList(b.dataset.list, currentAnalysis);
+}));
+
+/* =============== AJUSTES / WORKER =============== */
+function chipWorker(){
+  const c = $('#chipWorker');
+  if (!workerUrl){ c.className='chip err'; c.textContent='worker: sin configurar'; }
+  else { c.className='chip ok'; c.textContent='worker: conectado'; }
+}
+function abrirModal(){ $('#inpWorker').value = workerUrl; $('#testResult').textContent=''; $('#modal').classList.add('open'); }
+$('#btnAjustes').addEventListener('click', abrirModal);
+$('#modal').addEventListener('click', e=>{ if (e.target===e.currentTarget) $('#modal').classList.remove('open'); });
+$('#btnSaveWorker').addEventListener('click', ()=>{
+  workerUrl = $('#inpWorker').value.trim().replace(/\/+$/,'');
+  localStorage.setItem(LS_WORKER, workerUrl);
+  $('#modal').classList.remove('open');
+  chipWorker(); cargarEntorno();
+});
+$('#btnTestWorker').addEventListener('click', async ()=>{
+  const u = $('#inpWorker').value.trim().replace(/\/+$/,'');
+  const out = $('#testResult');
+  out.style.color=''; out.textContent = 'Probando…';
+  try {
+    const r = await fetch(u+'/');
+    const j = await r.json();
+    if (j.ok){ out.style.color='var(--green)'; out.textContent='✔ Conexión correcta con el Worker.'; }
+    else throw new Error('respuesta inesperada');
+  } catch(e){ out.style.color='var(--red)'; out.textContent='✘ No se pudo conectar. Revisa la URL.'; }
+});
+
+/* =============== ARRANQUE =============== */
+$('#btnAnalizar').addEventListener('click', analizar);
+$('#inpTicker').addEventListener('keydown', e=>{ if (e.key==='Enter') analizar(); });
+$('#btnRefEnv').addEventListener('click', cargarEntorno);
+
+chipWorker();
+renderLists();
+if (workerUrl) cargarEntorno();
+else { mostrarSinWorker(); setTimeout(abrirModal, 400); }
+</script>
+</body>
+</html>
