@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momentum App</title>
+    <!-- Tailwind CSS (Estilos) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue 3 (Lógica de interfaz) -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- FontAwesome (Iconos) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans min-h-screen">
+    
+    <div id="app" class="pb-12">
+        <!-- 1. HEADER Y CONTEXTO MACRO -->
+        <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-10 shadow-lg">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+                    <h1 class="text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 flex items-center gap-2">
+                        <i class="fas fa-chart-line text-emerald-400"></i> MOMENTUM APP
+                    </h1>
+                    
+                    <!-- Buscador -->
+                    <form @submit.prevent="handleSearch" class="flex w-full md:w-auto mt-4 md:mt-0 relative">
+                        <input 
+                            type="text" 
+                            placeholder="TICKER (ej. PLTR)" 
+                            class="w-full md:w-64 bg-slate-800 border border-slate-700 text-white px-4 py-2 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase font-mono"
+                            v-model="tickerInput"
+                            :disabled="loading"
+                        />
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-r-lg transition-colors flex items-center justify-center" :disabled="loading">
+                            <i class="fas fa-search" v-if="!loading"></i>
+                            <i class="fas fa-spinner fa-spin" v-else></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Panel Macro -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <!-- Indicador SP500 -->
+                    <div :class="['p-3 rounded-lg flex items-center gap-3 border', macroState.spyStatus ? 'bg-emerald-950/30 border-emerald-800/50' : 'bg-red-950/30 border-red-800/50']">
+                        <i :class="['fas fa-heartbeat text-2xl', macroState.spyStatus ? 'text-emerald-400' : 'text-red-400']"></i>
+                        <div>
+                            <p class="text-xs text-slate-400 font-semibold uppercase">SP500 vs M40 (Real-Time)</p>
+                            <p v-if="macroState.loading" class="font-bold text-slate-500">Cargando Macro...</p>
+                            <p v-else :class="['font-bold', macroState.spyStatus ? 'text-emerald-400' : 'text-red-400']">
+                                {{ macroState.spyStatus ? 'Favorable para Momentum' : 'Precaución / Entorno Hostil' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Flujo Capital -->
+                    <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center gap-3">
+                        <i class="fas fa-chart-pie text-cyan-400 text-2xl"></i>
+                        <div>
+                            <p class="text-xs text-slate-400 font-semibold uppercase">Flujo de Capital (5 días)</p>
+                            <p class="font-bold text-cyan-400">
+                                {{ macroState.flow }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Narrativas (Editable) -->
+                    <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 flex flex-col justify-center">
+                        <p class="text-xs text-slate-400 font-semibold uppercase mb-1 flex items-center gap-1">
+                            <i class="fas fa-fire text-orange-500"></i> Narrativas Calientes
+                        </p>
+                        <input 
+                            v-model="narratives" 
+                            @change="saveNarratives" 
+                            class="bg-transparent border-b border-slate-600 focus:outline-none focus:border-orange-400 w-full text-sm text-slate-300"
+                            placeholder="Escribe sectores fuertes aquí..."
+                        />
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto p-4 py-8">
+            
+            <div v-if="!loading && !data" class="text-center py-20 text-slate-500">
+                <i class="fas fa-search text-6xl opacity-20 mb-4 block"></i>
+                <h2 class="text-xl">Introduce un Ticker para comenzar la extracción de datos reales</h2>
+                <p class="mt-2 text-sm">Conectado a Yahoo Finance via Proxy público.</p>
+            </div>
+
+            <!-- 2. RESUMEN Y RESULTADOS DE EMPRESA -->
+            <div v-if="data && evalResult" class="space-y-6">
+                
+                <div class="bg-slate-900 rounded-xl border border-slate-800 p-6 shadow-xl relative overflow-hidden">
+                    <div v-if="data.isADR" class="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg flex items-center gap-1">
+                        <i class="fas fa-shield-alt"></i> ALERTA ADR
+                    </div>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h2 class="text-4xl font-black text-white flex items-baseline gap-3">
+                                {{ data.ticker }} 
+                                <span class="text-xl font-medium text-slate-400">{{ data.companyName }}</span>
+                            </h2>
+                            <p class="text-slate-400 mt-2 max-w-3xl leading-relaxed text-sm">
+                                {{ data.description }}
+                            </p>
+                        </div>
+                        
+                        <div class="flex flex-col items-center justify-center p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-inner min-w-[120px]">
+                            <div class="text-sm text-slate-400 mb-1 uppercase font-bold tracking-widest">Score</div>
+                            <div :class="['text-5xl font-black', evalResult.score >= 80 ? 'text-emerald-400' : (evalResult.score >= 50 ? 'text-yellow-400' : 'text-red-400')]">
+                                {{ evalResult.score }}
+                            </div>
+                            <div class="text-xs text-slate-500 mt-1">/ 100</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. EL CHECKLIST METICULOSO -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- BLOQUE A -->
+                    <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="bg-slate-950 border-b border-slate-800 p-4">
+                            <h3 class="font-bold text-white flex items-center gap-2">
+                                <i class="fas fa-heartbeat text-emerald-500"></i> BLOQUE A: CRÍTICOS
+                            </h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <check-item label="Ventas (Q YoY > 20%)" :value="formatPct(data.salesYoY)" :pass="evalResult.checkSales" critical="true"></check-item>
+                            <check-item label="EPS (Q YoY > 20%)" :value="formatPct(data.epsYoY)" :pass="evalResult.checkEPS" critical="true"></check-item>
+                            <check-item label="Guidance a Futuro" value="Evaluación Manual" :pass="true"></check-item>
+                        </div>
+                    </div>
+
+                    <!-- BLOQUE B -->
+                    <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="bg-slate-950 border-b border-slate-800 p-4">
+                            <h3 class="font-bold text-white flex items-center gap-2">
+                                <i class="fas fa-chart-pie text-cyan-500"></i> BLOQUE B: CLAVES
+                            </h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <check-item label="Market Cap ($2B-$40B)" :value="'$'+formatNum(data.marketCap)+'B'" :pass="evalResult.checkCap"></check-item>
+                            <check-item label="Precio > $10" :value="'$'+formatNum(data.price)" :pass="evalResult.checkPrice"></check-item>
+                            <check-item label="IPO Date (< 7 años)" :value="formatNum(data.ipoYears)+' años'" :pass="evalResult.checkIPO"></check-item>
+                            <check-item label="% Ownership (20-80%)" :value="formatPct(data.ownership)" :pass="evalResult.checkOwnership"></check-item>
+                        </div>
+                    </div>
+
+                    <!-- BLOQUE C -->
+                    <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+                        <div class="bg-slate-950 border-b border-slate-800 p-4">
+                            <h3 class="font-bold text-white flex items-center gap-2">
+                                <i class="fas fa-fire text-purple-500"></i> BLOQUE C: COMBUSTIBLE
+                            </h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div class="flex justify-between items-center pb-3 border-b border-slate-800/50">
+                                <span class="text-sm text-slate-300">Short Interest</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono text-white text-sm">{{ formatPct(data.shortInterest) }}</span>
+                                    <span :class="['text-xs px-2 py-1 rounded font-bold', data.shortInterest > 15 ? 'bg-purple-900/50 text-purple-400' : 'bg-slate-800 text-slate-400']">
+                                        {{ evalResult.shortCategory }}
+                                    </span>
+                                </div>
+                            </div>
+                            <check-item label="ROE (> 10%)" :value="formatPct(data.roe)" :pass="evalResult.checkROE"></check-item>
+                            <check-item label="Free Cash Flow" :value="formatNum(data.fcf)" :pass="evalResult.checkFCF"></check-item>
+                            <check-item label="Beta (1 - 2.5)" :value="formatNum(data.beta)" :pass="evalResult.checkBeta"></check-item>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-slate-300">Deuda/Equity</span>
+                                <span class="font-mono text-slate-400 text-sm">{{ formatPct(data.debt) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. VEREDICTO IA -->
+                <div :class="['p-6 rounded-xl border', evalResult.score >= 80 ? 'bg-emerald-950/20 border-emerald-800/50' : (evalResult.score >= 50 ? 'bg-yellow-950/20 border-yellow-800/50' : 'bg-red-950/20 border-red-800/50')]">
+                    <h3 class="text-lg font-bold mb-2 flex items-center gap-2">
+                        <i :class="['fas fa-info-circle', evalResult.score >= 80 ? 'text-emerald-400' : (evalResult.score >= 50 ? 'text-yellow-400' : 'text-red-400')]"></i>
+                        Veredicto del Analista Momentum
+                    </h3>
+                    <p class="text-slate-300 leading-relaxed">{{ evalResult.verdict }}</p>
+                </div>
+
+                <!-- 5. BOTONES DE ACCIÓN -->
+                <div class="flex flex-wrap gap-4 pt-4 border-t border-slate-800 mt-8">
+                    <button @click="addToWatchlist(data.ticker, 'Apta', evalResult.score)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-lg transition flex justify-center items-center gap-2">
+                        <i class="fas fa-plus"></i> 🟢 Apta (Watchlist)
+                    </button>
+                    <button @click="addToWatchlist(data.ticker, 'Radar', evalResult.score)" class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition flex justify-center items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i> 🟡 Radar
+                    </button>
+                    <button @click="clearSearch" class="flex-1 bg-slate-800 hover:bg-red-900/80 hover:text-red-200 text-slate-400 font-bold py-3 px-6 rounded-lg transition flex justify-center items-center gap-2 border border-slate-700">
+                        <i class="fas fa-times-circle"></i> 🔴 Descartar
+                    </button>
+                </div>
+            </div>
+
+            <!-- WATCHLIST DASHBOARD -->
+            <div class="mt-16 bg-slate-900 rounded-xl border border-slate-800 shadow-xl overflow-hidden">
+                <div class="bg-slate-950 border-b border-slate-800 p-5 flex justify-between items-center">
+                    <h3 class="font-bold text-white flex items-center gap-2 text-xl">
+                        <i class="fas fa-list text-cyan-500"></i> Lista de Vigilancia (Activas)
+                    </h3>
+                    <span class="text-sm text-slate-400 font-mono">Total: {{ watchlist.length }} / 12</span>
+                </div>
+                
+                <div v-if="watchlist.length === 0" class="p-8 text-center text-slate-500">
+                    Tu lista está vacía. Busca un Ticker y añádelo para darle seguimiento.
+                </div>
+                <div v-else class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-950/50">
+                            <tr>
+                                <th class="px-6 py-4 font-bold">Ticker</th>
+                                <th class="px-6 py-4 font-bold">Score</th>
+                                <th class="px-6 py-4 font-bold">Estado</th>
+                                <th class="px-6 py-4 font-bold">Fecha</th>
+                                <th class="px-6 py-4 font-bold text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in watchlist" :key="item.ticker" class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                                <td class="px-6 py-4 font-bold text-white text-lg">{{ item.ticker }}</td>
+                                <td class="px-6 py-4">
+                                    <span :class="['font-mono font-bold', item.score >= 80 ? 'text-emerald-400' : (item.score >= 50 ? 'text-yellow-400' : 'text-red-400')]">
+                                        {{ item.score }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span :class="['px-3 py-1 rounded-full text-xs font-bold border', item.status === 'Apta' ? 'bg-emerald-900/50 text-emerald-400 border-emerald-800/50' : 'bg-yellow-900/50 text-yellow-400 border-yellow-800/50']">
+                                        {{ item.status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-500">{{ item.date }}</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button @click="removeFromWatchlist(item.ticker)" class="text-slate-500 hover:text-red-400 transition-colors p-2">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        // Componente auxiliar para las filas del checklist
+        const CheckItem = {
+            props: ['label', 'value', 'pass', 'critical'],
+            template: `
+                <div class="flex justify-between items-center pb-3 border-b border-slate-800/50 last:border-0 last:pb-0">
+                    <span :class="['text-sm', critical && !pass ? 'text-red-400 font-semibold' : 'text-slate-300']">{{ label }}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono text-white text-sm font-medium">{{ value }}</span>
+                        <i v-if="pass" class="fas fa-check-circle text-emerald-500"></i>
+                        <i v-else :class="['fas fa-times-circle', critical ? 'text-red-500' : 'text-yellow-500']"></i>
+                    </div>
+                </div>
+            `
+        };
+
+        createApp({
+            components: { 'check-item': CheckItem },
+            setup() {
+                const tickerInput = ref('');
+                const loading = ref(false);
+                const data = ref(null);
+                const evalResult = ref(null);
+                const watchlist = ref(JSON.parse(localStorage.getItem('momentum_watchlist') || '[]'));
+                const narratives = ref(localStorage.getItem('momentum_narratives') || 'IA & Software, Aeroespacial, Ciberseguridad');
+                
+                const macroState = ref({ spyStatus: null, flow: 'Calculando...', loading: true });
+
+                const formatNum = (num) => num != null ? Number(num).toFixed(2) : 'N/A';
+                const formatPct = (num) => num != null ? Number(num).toFixed(1) + '%' : 'N/A';
+
+                const saveNarratives = () => localStorage.setItem('momentum_narratives', narratives.value);
+
+                // Puente Proxy gratuito para evitar bloqueos CORS
+                const fetchProxy = async (url) => {
+                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url + '&t=' + Date.now())}`;
+                    const res = await fetch(proxyUrl);
+                    const json = await res.json();
+                    if (!json.contents) throw new Error("Vacio");
+                    return JSON.parse(json.contents);
+                };
+
+                // Lógica de arranque: Calcula el SP500 y Flujos
+                onMounted(async () => {
+                    try {
+                        const jsonSPY = await fetchProxy('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1wk&range=1y');
+                        const closes = jsonSPY.chart.result[0].indicators.quote[0].close.filter(c => c != null);
+                        const current = closes[closes.length - 1];
+                        const last40 = closes.slice(-40);
+                        const avg40 = last40.reduce((a, b) => a + b, 0) / last40.length;
+
+                        // Comparativa rápida Nasdaq (QQQ) vs Russell (IWM)
+                        const jsonQ = await fetchProxy('https://query1.finance.yahoo.com/v8/finance/chart/QQQ?interval=1d&range=5d');
+                        const jsonI = await fetchProxy('https://query1.finance.yahoo.com/v8/finance/chart/IWM?interval=1d&range=5d');
+                        const qC = jsonQ.chart.result[0].indicators.quote[0].close;
+                        const iC = jsonI.chart.result[0].indicators.quote[0].close;
+                        const qPerf = (qC[qC.length - 1] - qC[0]) / qC[0];
+                        const iPerf = (iC[iC.length - 1] - iC[0]) / iC[0];
+
+                        macroState.value = {
+                            spyStatus: current > avg40,
+                            flow: qPerf > iPerf ? 'Nasdaq lidera (Sesgo Tech/Growth)' : 'Russell lidera (Apetito Small Caps)',
+                            loading: false
+                        };
+                    } catch (e) {
+                        macroState.value = { spyStatus: false, flow: 'Error de conexión', loading: false };
+                    }
+                });
+
+                // Extractor principal (¡Datos Reales!)
+                const handleSearch = async () => {
+                    if (!tickerInput.value.trim()) return;
+                    loading.value = true;
+                    data.value = null;
+                    const t = tickerInput.value.toUpperCase().trim();
+
+                    try {
+                        // 1. Calculamos la edad de la empresa (IPO)
+                        let ipoYears = 5;
+                        try {
+                            const jsonIPO = await fetchProxy(`https://query1.finance.yahoo.com/v8/finance/chart/${t}?interval=1mo&range=max`);
+                            const firstTs = jsonIPO.chart.result[0].timestamp[0];
+                            ipoYears = (Date.now() / 1000 - firstTs) / (365 * 24 * 60 * 60);
+                        } catch (e) { console.warn("Error calculando IPO"); }
+
+                        // 2. Extraemos todos los fundamentales de Yahoo Finance
+                        const json = await fetchProxy(`https://query1.finance.yahoo.com/v10/finance/quoteSummary/${t}?modules=defaultKeyStatistics,financialData,price,summaryProfile`);
+                        if (!json.quoteSummary || !json.quoteSummary.result) throw new Error("No existe");
+                        
+                        const res = json.quoteSummary.result[0];
+                        const fd = res.financialData || {};
+                        const dks = res.defaultKeyStatistics || {};
+                        const pr = res.price || {};
+                        const prof = res.summaryProfile || {};
+
+                        const rawData = {
+                            ticker: t,
+                            companyName: pr.shortName || t,
+                            description: prof.longBusinessSummary ? prof.longBusinessSummary.substring(0, 200) + "..." : "Sin descripción.",
+                            isADR: pr.quoteType === 'ADR' || (pr.shortName && pr.shortName.includes('ADR')),
+                            salesYoY: (fd.revenueGrowth?.raw || 0) * 100,
+                            epsYoY: (fd.earningsGrowth?.raw || 0) * 100,
+                            marketCap: (pr.marketCap?.raw || 0) / 1000000000,
+                            price: fd.currentPrice?.raw || 0,
+                            ipoYears: ipoYears,
+                            ownership: (dks.heldPercentInstitutions?.raw || 0) * 100,
+                            shortInterest: (dks.shortPercentOfFloat?.raw || 0) * 100,
+                            roe: (fd.returnOnEquity?.raw || 0) * 100,
+                            fcf: fd.freeCashflow?.raw || 0,
+                            beta: dks.beta?.raw || 1,
+                            debt: (fd.debtToEquity?.raw || 0)
+                        };
+
+                        data.value = rawData;
+                        evalResult.value = evaluate(rawData);
+
+                    } catch (error) {
+                        alert(`Error: No se pudo extraer datos de ${t}. Verifica que el Ticker sea correcto.`);
+                    } finally {
+                        loading.value = false;
+                    }
+                };
+
+                const evaluate = (d) => {
+                    const checkSales = d.salesYoY > 20;
+                    const checkEPS = d.epsYoY > 20;
+                    const checkCap = d.marketCap >= 2 && d.marketCap <= 40;
+                    const checkPrice = d.price > 10;
+                    const checkIPO = d.ipoYears <= 7;
+                    const checkOwnership = d.ownership >= 20 && d.ownership <= 80;
+                    const checkROE = d.roe > 10;
+                    const checkFCF = d.fcf > 0;
+                    const checkBeta = d.beta >= 1 && d.beta <= 2.5;
+                    const shortCategory = d.shortInterest > 15 ? 'Squeeze (>15%)' : (d.shortInterest > 5 ? 'Interesante' : 'Poco Peligro');
+
+                    let score = 0;
+                    if (checkSales) score += 20; else if (d.salesYoY > 0) score += 5;
+                    if (checkEPS) score += 20; else if (d.epsYoY > 0) score += 5;
+                    if (checkCap) score += 15; else if (d.marketCap > 0.5) score += 5;
+                    if (checkIPO) score += 15;
+                    
+                    if (checkOwnership) score += 5;
+                    if (d.shortInterest > 15) score += 10; else if (d.shortInterest > 5) score += 5;
+                    if (checkROE) score += (d.roe > 15 ? 5 : 3);
+                    if (checkFCF) score += 5;
+                    if (checkBeta) score += 2;
+
+                    if (d.isADR) score -= 15;
+                    if (!checkPrice) score -= 10;
+
+                    score = Math.max(0, Math.min(100, Math.round(score)));
+
+                    let verdict = "";
+                    if (score >= 80 && checkSales && checkEPS) {
+                        verdict = `Candidata PURA SANGRE (Score: ${score}). Crecimiento explosivo de Ventas y EPS. Ideal para buscar entrada por gráfico si el mercado acompaña.`;
+                    } else if (score >= 60 && checkSales) {
+                        verdict = `Candidata INTERESANTE (Score: ${score}). Crece bien en ventas pero le falla EPS o tamaño. Vigilar si la narrativa es muy fuerte.`;
+                    } else if (score < 50 || d.isADR) {
+                        verdict = `DESCARTADA (Score: ${score}). No cumple con los fundamentales exigidos por Momentum.`;
+                    } else {
+                        verdict = `PRECAUCIÓN (Score: ${score}). Faltan catalizadores. Solo apta con un setup técnico impecable.`;
+                    }
+
+                    if (macroState.value.spyStatus === false) verdict += " ⚠️ ATENCIÓN: El SP500 está débil, extremar precauciones.";
+
+                    return { checkSales, checkEPS, checkCap, checkPrice, checkIPO, checkOwnership, checkROE, checkFCF, checkBeta, shortCategory, score, verdict };
+                };
+
+                const addToWatchlist = (ticker, status, score) => {
+                    const count = watchlist.value.filter(i => i.status === 'Apta').length;
+                    if (status === 'Apta' && count >= 12 && !watchlist.value.find(i => i.ticker === ticker)) {
+                        alert("⚠️ OJO: Ya tienes 12 empresas Apta en seguimiento. Concéntrate en la calidad y no en la cantidad.");
+                    }
+                    const idx = watchlist.value.findIndex(i => i.ticker === ticker);
+                    const newItem = { ticker, status, score, date: new Date().toLocaleDateString() };
+                    if (idx >= 0) watchlist.value[idx] = newItem;
+                    else watchlist.value.unshift(newItem);
+                    
+                    localStorage.setItem('momentum_watchlist', JSON.stringify(watchlist.value));
+                    clearSearch();
+                };
+
+                const removeFromWatchlist = (ticker) => {
+                    watchlist.value = watchlist.value.filter(i => i.ticker !== ticker);
+                    localStorage.setItem('momentum_watchlist', JSON.stringify(watchlist.value));
+                };
+
+                const clearSearch = () => {
+                    data.value = null;
+                    tickerInput.value = '';
+                };
+
+                return { tickerInput, loading, data, evalResult, watchlist, macroState, narratives, saveNarratives, handleSearch, addToWatchlist, removeFromWatchlist, clearSearch, formatNum, formatPct };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
