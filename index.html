@@ -244,6 +244,20 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .inf-p{font-size:15.5px;line-height:1.65;margin:8px 0;max-width:820px}
 .rend-row{display:flex;gap:14px;font-family:var(--mono);font-size:14px;padding:6px 0;border-bottom:1px dashed var(--panel2)}
 .rend-row span:first-child{width:110px;font-weight:600;color:var(--ink)}
+.tabs .tab.active{background:var(--amber)!important;color:#14100A!important;border-color:var(--amber)!important;font-weight:700}
+.tabs .tab.active .n{color:#14100A;opacity:.75}
+.cart-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+#sectorSide{position:sticky;top:74px;max-height:calc(100vh - 90px);overflow-y:auto}
+@media(max-width:1000px){.cart-grid{grid-template-columns:1fr}#sectorSide{position:static;max-height:none}}
+.ct-head{border-bottom:1px solid var(--line)!important;padding:6px 4px!important}
+.ct-h{cursor:pointer;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;user-select:none}
+.ct-h:hover{color:var(--amber)}
+.sec-w{margin-bottom:9px}
+.sec-w-top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px}
+.sec-w-top span:first-child{color:var(--ink2)}
+.sec-w-top span:last-child{font-family:var(--mono);font-size:12px}
+.sec-w-bar{height:5px;background:var(--panel2);border-radius:3px;overflow:hidden}
+.sec-w-bar i{display:block;height:100%;border-radius:3px}
 /* ---------- Resultados semana ---------- */
 .wk-head{display:flex;align-items:center;gap:14px;cursor:pointer}
 .wk-title{font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
@@ -365,10 +379,14 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
     <!-- VISTA MI CARTERA -->
     <section class="view active" id="view-cartera">
       <div class="page-title">Mi Cartera <span class="chip" id="carteraStatus">cargando…</span> <button class="btn-mini" id="btnRefCartera">Actualizar</button></div>
-      <div class="tabs" id="portTabs" style="margin-bottom:0"></div>
-      <div class="card" style="padding:10px 14px">
-        <div id="ctTotals"></div>
-        <div id="carteraBody"><div class="skeleton" style="padding:12px 4px">Cargando cartera…</div></div>
+      <div class="cart-grid">
+        <div>
+          <div class="tabs" id="portTabs" style="margin-bottom:0"></div>
+          <div class="card" style="padding:8px 14px">
+            <div id="carteraBody"><div class="skeleton" style="padding:12px 4px">Cargando cartera…</div></div>
+          </div>
+        </div>
+        <aside class="card" id="sectorSide" style="padding:14px"><div class="skeleton">—</div></aside>
       </div>
     </section>
 
@@ -1462,6 +1480,7 @@ async function initCartera(){
       renderCartera();
       restaurarDividendos();
       fetchEarningsCal(true).then(()=>fetchInsidersCartera(true)).then(()=>scanAlerts()).catch(()=>{});
+      loadPrimasOpciones();
       return;
     }catch(e){console.warn('SWING 2026 no disponible, uso hoja antigua:',e.message);}
   }
@@ -1506,63 +1525,122 @@ async function initCartera(){
     $('#carteraBody').innerHTML='<div class="sub-line" style="padding:10px 4px">No se pudo cargar la cartera: '+esc(e.message)+'</div>';
   }
 }
+let ctSort={col:'peso',dir:'desc'};
+let primasCache={},primasTs=0;
 function renderCartera(){
-  renderPortTabs();renderTotals();
-  const fP=(x)=>x==null?'':`<span class="ct-peso">${(x*100).toFixed(1)}%</span>`;
-  const fPL=(pl,pct)=>{
-    if(pl==null&&pct==null)return '<span class="ct-pl"></span>';
-    const cls=(pl??pct??0)>=0?'pos':'neg';
-    const eur=pl!=null?((pl>=0?'+':'')+pl.toLocaleString('es-ES',{maximumFractionDigits:0})+'€'):'';
-    const pc=pct!=null?` ${(pct>=0?'+':'')+(pct*100).toFixed(1)}%`:'';
-    return `<span class="ct-pl ${cls}">${eur}${pc}</span>`;
-  };
-  const botones=(t,name)=>{
+  renderPortTabs();
+  const f=(x)=>x==null?'—':`<span class="${x>=0?'pos':'neg'}">${(x>0?'+':'')+(x*100).toFixed(1)}%</span>`;
+  const botones=(t)=>{
     const litE=earningsAlerts.has(t),litI=insiderAlerts.has(t),litA=!!alertData[t];
     const eTip=litE&&earnInfo[t]?` title="${esc(earnInfo[t])}"`:'';
-    return `<a class="ct-btn" href="${tvUrl(base(t),t.includes('.')?'':'auto')}" target="_blank" rel="noopener">Gráfico</a>
-      <button class="ct-btn" data-go="momentum" data-tk="${esc(t)}">Momentum</button>
-      <button class="ct-btn ${litE?'lit-e':''}" data-panel="earn" data-tk="${esc(t)}" ${litE?'':'disabled'}${eTip}>Resultados</button>
-      <button class="ct-btn ${litI?'lit-i':''}" data-panel="ins" data-tk="${esc(t)}" ${litI?'':'disabled'}>Insiders</button>
+    return `<a class="ct-btn" href="https://es.investing.com/pro/${esc(base(t))}" target="_blank" rel="noopener">Investing</a>
+      <a class="ct-btn" href="${tvUrl(base(t),t.includes('.')?'':'auto')}" target="_blank" rel="noopener">Gráfico</a>
+      <button class="ct-btn" data-go="analisis" data-tk="${esc(t)}">Analizar</button>
+      <button class="ct-btn ${litE?'lit-e':''}" data-panel="earn" data-tk="${esc(t)}" ${litE?'':'disabled'}${eTip} title="Resultados">R</button>
+      <button class="ct-btn ${litI?'lit-i':''}" data-panel="ins" data-tk="${esc(t)}" ${litI?'':'disabled'} title="Insiders">I</button>
       <span class="alert-wrap">
-        <button class="ct-btn ${litA?'lit-a':''}" data-alert="${esc(t)}" ${litA?'':'disabled'}>⚡</button>
+        <button class="ct-btn ${litA?'lit-a':''}" data-alert="${esc(t)}" ${litA?'':'disabled'} title="Actividad inusual">⚡</button>
         ${litA?`<span class="ct-tip">${alertData[t].join('<br>')}</span>`:''}
       </span>`;
   };
+  const hd=(col,label,style)=>`<span class="ct-h" data-sort="${col}" style="${style}">${label}${ctSort.col===col?(ctSort.dir==='desc'?' ▼':' ▲'):''}</span>`;
+  const sortear=(arr,val)=>{
+    const d=ctSort.dir==='desc'?-1:1;
+    return [...arr].sort((a,b)=>{const va=val(a),vb=val(b);
+      if(typeof va==='string'&&typeof vb==='string')return va.localeCompare(vb)*d;
+      return ((va??-9e9)-(vb??-9e9))*d;});
+  };
   if(sheetOk){
-    const list=activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort);
-    $('#carteraBody').innerHTML=list.map(p=>{
+    let list=activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort);
+    const val=(p)=>({ticker:p.t,name:p.name,peso:p.peso,pl:p.plPct,port:p.port})[ctSort.col];
+    list=sortear(list,val);
+    const head=`<div class="ct-row ct-head">${hd('ticker','Ticker','width:74px;flex:none')}${hd('name','Nombre','flex:0 1 240px;min-width:110px')}${hd('peso','Peso','width:56px;text-align:right;flex:none')}${hd('pl','P&L %','width:70px;text-align:right;flex:none')}${activePort==='ALL'?hd('port','Cartera','width:70px;flex:none'):''}</div>`;
+    $('#carteraBody').innerHTML=head+list.map(p=>{
       const t=p.t;
       let extra='';
       if(p.port==='OPCIONES'&&p.exp){
         const d=parseExpDate(p.exp);
         if(d){const dias=Math.round((d-Date.now())/86400000);
-          extra=`<span class="ct-exp" style="color:${dias<90?'var(--red)':dias<180?'var(--warn)':'var(--ink3)'};background:var(--panel2)">${p.strike!=null?p.strike+'$ · ':''}${dias}d</span>`;}
+          const epoch=Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/1000);
+          const pr=primasCache[t+'|'+p.strike+'|'+epoch];
+          extra=`<span class="ct-exp" style="color:${dias<90?'var(--red)':dias<180?'var(--warn)':'var(--ink3)'};background:var(--panel2)">${p.strike!=null?p.strike+'$ · ':''}${dias}d</span>`+
+                (pr?`<span class="ct-exp" style="color:var(--ink2);background:var(--panel2)" title="Prima actual del contrato (punto medio bid/ask de Yahoo)">prima ${pr.prima.toFixed(2)}$</span>`:'');}
       }
       return `<div class="ct-row" data-t="${esc(t)}">
         <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" title="Abrir en Análisis" style="cursor:pointer">${esc(t)}</span>
         <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" title="Abrir en Análisis" style="cursor:pointer">${esc(p.name)}</span>
-        ${p.sector?`<span class="ct-sec">${esc(p.sector)}</span>`:''}
+        <span class="ct-peso">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
+        <span class="ct-pl" style="width:70px">${f(p.plPct)}</span>
+        ${activePort==='ALL'?`<span class="ct-sec" style="color:var(--amber);width:70px;flex:none;text-align:left">${esc(p.port)}</span>`:''}
         ${extra}
-        ${fP(p.peso)}
-        ${fPL(p.pl,p.plPct)}
-        ${activePort==='ALL'?`<span class="ct-sec" style="color:var(--amber)">${esc(p.port)}</span>`:''}
-        ${botones(t,p.name)}
+        ${botones(t)}
         <div class="ct-panel" id="ctp-${esc(t)}" style="display:none"></div>
       </div>`;
     }).join('')||'<div class="sub-line" style="padding:10px 4px">Esta cartera no tiene posiciones.</div>';
+    renderSectorSide();
     return;
   }
-  // respaldo: filas simples desde la hoja antigua
-  const list=activePort==='ALL'?companies:companies.filter(c=>c.port===activePort);
-  $('#carteraBody').innerHTML=list.map(c=>{
+  let list=activePort==='ALL'?companies:companies.filter(c=>c.port===activePort);
+  const val2=(c)=>({ticker:c.yahooTicker,name:c.name})[ctSort.col]||c.name;
+  list=sortear(list,val2);
+  $('#carteraBody').innerHTML=`<div class="ct-row ct-head">${hd('ticker','Ticker','width:74px;flex:none')}${hd('name','Nombre','flex:0 1 240px;min-width:110px')}</div>`+
+    list.map(c=>{
     const t=c.yahooTicker;
     return `<div class="ct-row" data-t="${esc(t)}">
       <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
       <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(c.name)}</span>
-      ${botones(t,c.name)}
+      ${botones(t)}
       <div class="ct-panel" id="ctp-${esc(t)}" style="display:none"></div>
     </div>`;
   }).join('')||'<div class="sub-line" style="padding:10px 4px">Esta cartera no tiene valores.</div>';
+  renderSectorSide();
+}
+function renderSectorSide(){
+  const el=$('#sectorSide');if(!el)return;
+  if(!sheetOk){el.innerHTML='<h3>Sectores</h3><div class="sub-line">Disponible al conectar SWING 2026.</div>';return;}
+  const list=activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort);
+  const w=(p)=>activePort==='ALL'?(p.inv??0):(p.peso??0);
+  const by={};let tw=0;
+  list.forEach(p=>{const s=(p.sector||'—').toUpperCase();const wi=w(p);if(!wi)return;
+    by[s]=by[s]||{w:0,plw:0,n:0};by[s].w+=wi;if(p.plPct!=null)by[s].plw+=wi*p.plPct;by[s].n++;tw+=wi;});
+  const rows=Object.entries(by).map(([s,x])=>({s,peso:x.w/(tw||1),pl:x.w?x.plw/x.w:null,n:x.n})).sort((a,b)=>b.peso-a.peso);
+  const f=(x)=>x==null?'—':`<span class="${x>=0?'pos':'neg'}">${(x>0?'+':'')+(x*100).toFixed(1)}%</span>`;
+  const conPl=list.filter(p=>p.plPct!=null);
+  const verdes=conPl.filter(p=>p.plPct>0).length,rojas=conPl.filter(p=>p.plPct<0).length;
+  const wTot=list.reduce((a,p)=>a+w(p),0)||1;
+  const plPond=list.reduce((a,p)=>a+(p.plPct!=null?w(p)*p.plPct:0),0)/wTot;
+  const best=[...conPl].sort((a,b)=>b.plPct-a.plPct)[0];
+  const worst=[...conPl].sort((a,b)=>a.plPct-b.plPct)[0];
+  el.innerHTML=`<h3>Sectores · ${activePort==='ALL'?'todas':esc(activePort)}</h3>`+
+    rows.map(r=>`<div class="sec-w"><div class="sec-w-top"><span>${esc(r.s)}</span><span>${(r.peso*100).toFixed(1)}% · ${f(r.pl)}</span></div><div class="sec-w-bar"><i style="width:${Math.min(r.peso*100,100)}%;background:${r.pl==null?'var(--ink3)':(r.pl>=0?'var(--green)':'var(--red)')}"></i></div></div>`).join('')+
+    `<div class="rep-h" style="margin-top:14px">En breve</div>
+     <div class="rep-li">P&L ponderado: ${f(plPond)}</div>
+     <div class="rep-li">${verdes} en verde · ${rojas} en rojo</div>
+     ${best?`<div class="rep-li">Mejor: <b style="font-family:var(--mono);color:var(--amber)">${esc(best.t)}</b> ${f(best.plPct)}</div>`:''}
+     ${worst?`<div class="rep-li">Peor: <b style="font-family:var(--mono);color:var(--amber)">${esc(worst.t)}</b> ${f(worst.plPct)}</div>`:''}
+     ${rows[0]&&rows[0].peso>0.3?`<div class="rep-li" style="color:var(--warn)">⚠ ${esc(rows[0].s)} concentra el ${(rows[0].peso*100).toFixed(0)}%</div>`:''}`;
+}
+async function loadPrimasOpciones(){
+  if(!sheetOk||!workerUrl)return;
+  if(Date.now()-primasTs<10*60*1000)return;
+  const ops=posiciones.filter(p=>p.port==='OPCIONES'&&p.strike!=null&&p.exp&&!p.t.includes('.'));
+  if(!ops.length)return;
+  primasTs=Date.now();
+  let nuevas=0;
+  await pool(ops,4,async(p)=>{
+    try{
+      const d=parseExpDate(p.exp);if(!d)return;
+      const epoch=Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/1000);
+      const j=await api('/options/'+encodeURIComponent(p.t)+'?date='+epoch);
+      const o=j?.optionChain?.result?.[0]?.options?.[0];
+      const call=(o?.calls||[]).find(c=>Math.abs((rv(c.strike)??-1)-p.strike)<0.01);
+      if(!call)return;
+      const bid=rv(call.bid),ask=rv(call.ask),last=rv(call.lastPrice);
+      const prima=(bid&&ask)?(bid+ask)/2:last;
+      if(prima!=null){primasCache[p.t+'|'+p.strike+'|'+epoch]={prima};nuevas++;}
+    }catch(e){}
+  });
+  if(nuevas)renderCartera();
 }
 let activePort=localStorage.getItem('pit_cartera_filter')||'ALL';
 let portOrder=[],repCurr=[],repNext=[],carteraMetrics={};
@@ -1581,8 +1659,14 @@ function renderPortTabs(){
 $('#portTabs').addEventListener('click',e=>{
   const b=e.target.closest('[data-port]');if(!b)return;
   activePort=b.dataset.port;localStorage.setItem('pit_cartera_filter',activePort);renderCartera();
+  if(activePort==='OPCIONES'||activePort==='ALL')loadPrimasOpciones();
 });
 $('#carteraBody').addEventListener('click',async e=>{
+  const sb=e.target.closest('[data-sort]');
+  if(sb){const c=sb.dataset.sort;
+    if(ctSort.col===c)ctSort.dir=ctSort.dir==='desc'?'asc':'desc';
+    else{ctSort.col=c;ctSort.dir=(c==='name'||c==='ticker')?'asc':'desc';}
+    renderCartera();return;}
   const go=e.target.closest('[data-go]');
   if(go){const t=go.dataset.tk;
     const c=companies.find(x=>x.yahooTicker===t);
@@ -2229,42 +2313,30 @@ async function cargarSheetCompleto(){
   companies.sort((a,b)=>a.name.localeCompare(b.name));
   sheetOk=true;
 }
-function renderTotals(){
-  const el=$('#ctTotals');if(!el)return;
-  const fmtE=(x)=>x==null?'—':x.toLocaleString('es-ES',{maximumFractionDigits:0})+' €';
-  const fmtP=(x)=>x==null?'—':`<span class="${x>=0?'pos':'neg'}">${(x>0?'+':'')+(x*100).toFixed(1)}%</span>`;
-  if(!sheetOk){el.innerHTML='';return;}
-  if(activePort==='ALL'){
-    let inv=0,act=0,pl=0;
-    PORT_TABS.forEach(p=>{const t=totalsByPort[p]||{};inv+=t.inv||0;act+=t.act||0;pl+=t.pl||0;});
-    el.innerHTML=`<div class="tot-bar">
-      <span class="tot-item">Invertido<b>${fmtE(inv)}</b></span>
-      <span class="tot-item">Valor actual<b>${fmtE(act)}</b></span>
-      <span class="tot-item">P&L latente<b class="${pl>=0?'pos':'neg'}">${(pl>=0?'+':'')+fmtE(pl)}</b></span>
-      <span class="tot-item">Posiciones<b>${posiciones.length}</b></span></div>`;
-  }else{
-    const t=totalsByPort[activePort]||{};
-    el.innerHTML=`<div class="tot-bar">
-      <span class="tot-item">Invertido<b>${fmtE(t.inv)}</b></span>
-      <span class="tot-item">Valor actual<b>${fmtE(t.act)}</b></span>
-      <span class="tot-item">P&L<b class="${(t.pl||0)>=0?'pos':'neg'}">${t.pl!=null?((t.pl>=0?'+':'')+fmtE(t.pl)):'—'} ${t.pct!=null?fmtP(t.pct):''}</b></span>
-      <span class="tot-item">Cash<b>${t.cash!=null?(t.cash*100).toFixed(1)+'%':'—'}</b></span>
-      <span class="tot-item">Activos<b>${t.activos!=null?Math.round(t.activos):posiciones.filter(p=>p.port===activePort).length}</b></span></div>`;
-  }
-}
 
 /* ═══════ INFORME ═══════ */
 let sectorData=null;
 const SEC_MAP={'ENERGIA':'Energía','TECNOLOGIA':'Tecnología','SALUD':'Salud','FINANCIERO':'Financiero','MATERIALES':'Materiales','INDUSTRIAL':'Industrial','C.BÁSICO':'Consumo Básico','C.BASICO':'Consumo Básico','DISCRECIONAL':'Consumo Discrec.','UTILITIES':'Utilities','COMUNICACION':'Comunicación','REAL ESTATE':'Real Estate'};
-function rendPonderado(port){
-  const list=posiciones.filter(p=>(port==='ALL'||p.port===port)&&p.peso&&carteraMetrics[p.t]);
+function rendTab(port){
+  const list=posiciones.filter(p=>p.port===port&&p.peso&&carteraMetrics[p.t]);
   let w=0,d1=0,d5=0;
   for(const p of list){const m=carteraMetrics[p.t];
-    if(m.chg1!=null){d1+=p.peso*m.chg1;}
-    if(m.chg5!=null){d5+=p.peso*m.chg5;}
+    if(m.chg1!=null)d1+=p.peso*m.chg1;
+    if(m.chg5!=null)d5+=p.peso*m.chg5;
     w+=p.peso;}
   if(!w)return null;
   return{d1:d1/w,d5:d5/w,n:list.length};
+}
+function rendPonderado(port){
+  if(port!=='ALL')return rendTab(port);
+  let ws=0,d1=0,d5=0,n=0;
+  for(const tab of PORT_TABS){
+    const r=rendTab(tab);if(!r)continue;
+    const t=totalsByPort[tab]||{};
+    const wv=t.act||t.inv||1;
+    d1+=wv*r.d1;d5+=wv*r.d5;ws+=wv;n+=r.n;
+  }
+  return ws?{d1:d1/ws,d5:d5/ws,n}:null;
 }
 function renderInforme(){
   $('#infFecha').textContent=fmtES(new Date());
@@ -2284,38 +2356,51 @@ function renderInforme(){
       `<div style="display:flex;gap:30px;flex-wrap:wrap;margin-top:12px">
         <div><div class="rep-h">Te empujan</div>${top.map(x=>`<div class="rep-li"><b style="font-family:var(--mono);color:var(--amber)">${esc(x.t)}</b> ${f(x.chg1)}</div>`).join('')}</div>
         <div><div class="rep-h">Te frenan</div>${bot.map(x=>`<div class="rep-li"><b style="font-family:var(--mono);color:var(--amber)">${esc(x.t)}</b> ${f(x.chg1)}</div>`).join('')}</div>
-      </div>`;
+      </div><div class="sub-line" style="margin-top:10px">Estimación con precios de Yahoo (retardo ~15 min). El P&L real es el de tu hoja; QF va apalancado y aquí no se ajusta. Úsalo como dirección, no como cifra.</div>`;
   }else rend.innerHTML='<h3>Comportamiento de la cartera · 1 día / 1 semana</h3><div class="skeleton"><span class="loading"></span> Escaneando posiciones…</div>';
 
-  // --- Narrativa automática ---
+  // --- Narrativa automática (v2: aportaciones, no obviedades) ---
   const narr=$('#infNarr');
   const ps=[];
-  if(sectorData&&sectorData.length){
-    const s=[...sectorData].filter(x=>x.d1!=null);
-    if(s.length){
-      const lider=s[0],cola=s[s.length-1];
-      ps.push(`Hoy el dinero favorece <b>${esc(lider.n)}</b> (${(lider.d1>0?'+':'')+(lider.d1*100).toFixed(1)}%) y castiga <b>${esc(cola.n)}</b> (${(cola.d1*100).toFixed(1)}%).`);
-      if(lider.d1>0.005&&cola.d1<-0.005)ps.push(`El patrón sugiere rotación: sale dinero de ${esc(cola.n)} hacia ${esc(lider.n)}.`);
+  if(sheetOk&&sectorW.length&&sectorData){
+    const contribs=sectorW.map(sw=>{
+      const etfN=SEC_MAP[sw.sector.toUpperCase()]||sw.sector;
+      const sd=sectorData.find(x=>x.n===etfN);
+      return (sd&&sd.d1!=null)?{s:etfN,peso:sw.peso,c:sw.peso*sd.d1}:null;
+    }).filter(Boolean).sort((a,b)=>b.c-a.c);
+    if(contribs.length>1){
+      const top=contribs[0],bot=contribs[contribs.length-1];
+      const pp=(x)=>`${x>=0?'+':''}${(x*100).toFixed(2)}pp`;
+      if(top.c>0.0004||bot.c<-0.0004){
+        ps.push(`Lo que de verdad te mueve hoy: <b>${esc(top.s)}</b> te aporta ${pp(top.c)} (pesas un ${(top.peso*100).toFixed(0)}% ahí)${bot.c<0?` mientras <b>${esc(bot.s)}</b> te resta ${pp(bot.c)}`:''}. El resto es ruido.`);
+      }
+      const conc=contribs.filter(x=>x.peso>0.25);
+      if(conc.length)ps.push(`⚠ Tu día depende sobre todo de ${conc.map(x=>'<b>'+esc(x.s)+'</b>').join(' y ')} (más del 25% del capital): una rotación contra ese sector te pega más a ti que al índice. Vigila si el flujo del radar empieza a salir de ahí varios días seguidos.`);
+    }
+  }
+  if(sectorData){
+    const s=sectorData.filter(x=>x.d1!=null);
+    if(s.length>3){
+      const spread=s[0].d1-s[s.length-1].d1;
+      if(spread>0.02)ps.push(`Rotación fuerte hoy: ${(spread*100).toFixed(1)} puntos entre <b>${esc(s[0].n)}</b> y <b>${esc(s[s.length-1].n)}</b>. Los días de dispersión así suelen marcar cambio de liderazgo, no ruido — merece un vistazo al radar.`);
     }
   }
   if(typeof radarData==='object'&&radarData&&radarData.focos&&radarData.focos.length){
-    ps.push(`En el radar, el flujo se concentra en: <b>${radarData.focos.slice(0,3).map(g=>esc(g.key)).join('</b>, <b>')}</b>.`);
-  }
-  if(sheetOk&&sectorW.length&&sectorData){
-    const mayor=[...sectorW].sort((a,b)=>b.peso-a.peso)[0];
-    const etfN=SEC_MAP[mayor.sector.toUpperCase()]||mayor.sector;
-    const sd=sectorData.find(x=>x.n===etfN);
-    if(sd&&sd.d1!=null){
-      const dir=sd.d1>=0?'sube':'cae';
-      ps.push(`Tu mayor exposición es <b>${esc(etfN)}</b> (${(mayor.peso*100).toFixed(0)}% de la cartera), que hoy ${dir} ${(Math.abs(sd.d1)*100).toFixed(1)}% — ${sd.d1>=0?'te impulsa':'te lastra'}.`);
+    const focoNames=radarData.focos.slice(0,3).map(g=>g.key);
+    let coincide=null;
+    if(sheetOk){
+      const misSec=new Set(posiciones.map(p=>(p.sector||'').toUpperCase()));
+      coincide=focoNames.find(fn=>{const up=fn.toUpperCase();
+        return [...misSec].some(ms=>ms&&(up.includes(ms.slice(0,5))||ms.includes(up.slice(0,5))));});
     }
+    ps.push(`El dinero del día se concentra en <b>${focoNames.map(esc).join('</b>, <b>')}</b>${coincide?` — y ahí tienes exposición: aprovecha para revisar tus posiciones de ese grupo`:` — nada de tu cartera juega en esa mesa hoy`}.`);
   }
   const rt=rendPonderado('ALL');
-  if(rt&&rt.d1!=null)ps.push(`Estimación del día para tu cartera: <b class="${rt.d1>=0?'pos':'neg'}">${(rt.d1>0?'+':'')+(rt.d1*100).toFixed(2)}%</b> ponderado por pesos.`);
+  if(rt&&rt.d1!=null&&Math.abs(rt.d1)>0.002)ps.push(`Dirección estimada de tu cartera hoy: <b class="${rt.d1>=0?'pos':'neg'}">${(rt.d1>0?'+':'')+(rt.d1*100).toFixed(2)}%</b> ponderada por el valor de cada sub-cartera.`);
   const nAl=Object.keys(alertData).length;
-  if(nAl)ps.push(`⚡ ${nAl} valor${nAl>1?'es':''} con actividad inusual — detalle en Mi Cartera.`);
-  narr.innerHTML='<h3>Lectura del día</h3>'+(ps.length?ps.map(p=>`<p class="inf-p">${p}</p>`).join(''):'<div class="sub-line">Aún cargando datos de mercado…</div>')+
-    '<div class="sub-line" style="margin-top:6px">Texto generado automáticamente a partir de sectores, radar y tus pesos reales. Orientativo, no es una recomendación.</div>';
+  if(nAl)ps.push(`⚡ ${nAl} valor${nAl>1?'es':''} tuyo${nAl>1?'s':''} con actividad inusual — el detalle está en Mi Cartera.`);
+  narr.innerHTML='<h3>Lectura del día</h3>'+(ps.length?ps.map(p=>`<p class="inf-p">${p}</p>`).join(''):'<div class="sub-line">Sin señales destacables ahora mismo — día tranquilo o datos aún cargando.</div>')+
+    '<div class="sub-line" style="margin-top:6px">Generado automáticamente cruzando sectores, radar y tus pesos. Orientativo, no es recomendación.</div>';
 
   // --- Vencimientos de opciones ---
   const venc=$('#infVenc');
