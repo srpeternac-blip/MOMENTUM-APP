@@ -24,7 +24,7 @@ button{font-family:inherit;cursor:pointer}
 /* ---------- Cabecera ---------- */
 header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 22px;background:rgba(12,15,20,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .brand{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:.12em;text-transform:uppercase}
-.brand em{color:var(--amber);font-style:normal}
+.brand em{color:var(--green);font-style:normal}
 .hdr-right{display:flex;align-items:center;gap:10px}
 .chip{font-family:var(--mono);font-size:12px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;color:var(--ink2)}
 .chip.ok{color:var(--green);border-color:rgba(49,208,122,.4)}
@@ -213,11 +213,11 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 
 
 /* ---------- Cartera ---------- */
-.ct-row{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--panel2);flex-wrap:wrap}
+.ct-row{display:flex;align-items:center;gap:7px;padding:6px 4px;border-bottom:1px solid var(--panel2);flex-wrap:wrap}
 .ct-row:last-child{border-bottom:0}
-.ct-tick{font-family:var(--mono);font-weight:600;color:var(--amber);width:74px;flex:none}
-.ct-name{flex:0 1 240px;min-width:110px;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ct-btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);border-radius:8px;padding:5px 11px;font-size:12.5px;white-space:nowrap}
+.ct-tick{font-family:var(--mono);font-weight:600;color:var(--amber);width:62px;flex:none;font-size:13px}
+.ct-name{flex:0 1 185px;min-width:100px;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ct-btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);border-radius:7px;padding:3px 8px;font-size:11.5px;white-space:nowrap}
 .ct-btn:hover{color:var(--ink);border-color:var(--ink3)}
 .ct-btn.lit-e{color:var(--amber);border-color:var(--amber);font-weight:600}
 .ct-btn.lit-i{color:var(--green);border-color:var(--green);font-weight:600}
@@ -234,7 +234,7 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .rep-li{padding:3px 0;font-size:13.5px;line-height:1.45}
 .bar-row{display:flex;gap:10px;font-family:var(--mono);font-size:12.5px;padding:3px 0;border-bottom:1px dashed var(--panel2)}
 .bar-row span:first-child{color:var(--amber);font-weight:600;width:64px}
-.ct-peso{font-family:var(--mono);font-size:12.5px;color:var(--ink2);width:56px;text-align:right;flex:none}
+.ct-peso{font-family:var(--mono);font-size:13px;color:var(--ink);font-weight:700;width:50px;text-align:right;flex:none}
 .ct-pl{font-family:var(--mono);font-size:13px;font-weight:600;width:118px;text-align:right;flex:none;white-space:nowrap}
 .ct-sec{font-size:10.5px;font-family:var(--mono);color:var(--ink3);background:var(--panel2);padding:2px 7px;border-radius:5px;flex:none}
 .ct-exp{font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:5px;flex:none}
@@ -258,6 +258,15 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .sec-w-top span:last-child{font-family:var(--mono);font-size:12px}
 .sec-w-bar{height:5px;background:var(--panel2);border-radius:3px;overflow:hidden}
 .sec-w-bar i{display:block;height:100%;border-radius:3px}
+#sectorSide{margin-top:37px}
+.side-tabs{display:flex;gap:6px;margin-bottom:10px}
+.stab{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);border-radius:7px;padding:5px 10px;font-size:12px;position:relative}
+.stab.active{background:var(--amber);color:#14100A;border-color:var(--amber);font-weight:700}
+.sdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle}
+.stab.active .sdot{background:#14100A}
+.sec-mini{display:flex;gap:8px;font-family:var(--mono);font-size:11.5px;padding:2px 0 2px 16px;color:var(--ink2)}
+.sec-mini b{color:var(--amber);width:58px;font-weight:600}
+.sec-mini span{width:48px;text-align:right}
 /* ---------- Resultados semana ---------- */
 .wk-head{display:flex;align-items:center;gap:14px;cursor:pointer}
 .wk-title{font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
@@ -1415,12 +1424,12 @@ async function loadSectorMap(force){
       .catch(()=>({...x,d1:null,s5:null}))));
     res.sort((a,b)=>(b.d1??-9)-(a.d1??-9));
     sectorTs=Date.now();sectorData=res;
-    el.innerHTML='<h3>Sectores · hoy</h3>'+res.map(x=>`
-      <div class="sec-tile" style="background:${heatColor(x.d1!=null?x.d1*100:null)}" title="1 semana: ${x.s5==null?'N/D':(x.s5>0?'+':'')+pct(x.s5,1)}">
+    el.innerHTML='<h3>Sectores <span style="font-weight:400;font-size:11px;color:var(--ink3);text-transform:none;font-family:var(--mono)">1d · 1s</span></h3>'+res.map(x=>`
+      <div class="sec-tile" style="background:${heatColor(x.d1!=null?x.d1*100:null)}">
         <span class="nm">${esc(x.n)}</span>
-        <span class="pc ${(x.d1??0)>=0?'pos':'neg'}">${x.d1==null?'N/D':(x.d1>0?'+':'')+pct(x.d1,1)}</span>
-      </div>`).join('')+
-      '<div class="sub-line" style="margin-top:8px">Última sesión · pasa el ratón para ver 1 semana.</div>';
+        <span class="pc ${(x.d1??0)>=0?'pos':'neg'}">${x.d1==null?'—':(x.d1>0?'+':'')+pct(x.d1,1)}</span>
+        <span class="pc" style="opacity:.75;width:52px;text-align:right;${(x.s5??0)>=0?'color:var(--green)':'color:var(--red)'}">${x.s5==null?'—':(x.s5>0?'+':'')+pct(x.s5,1)}</span>
+      </div>`).join('');
   }catch(e){el.innerHTML='<h3>Sectores · hoy</h3><div class="sub-line">Error: '+esc(e.message)+'</div>';}
 }
 $('#btnRefRadar').addEventListener('click',()=>{cargarRadar(true);loadSectorMap(true);});
@@ -1536,10 +1545,10 @@ function renderCartera(){
     return `<a class="ct-btn" href="https://es.investing.com/pro/${esc(base(t))}" target="_blank" rel="noopener">Investing</a>
       <a class="ct-btn" href="${tvUrl(base(t),t.includes('.')?'':'auto')}" target="_blank" rel="noopener">Gráfico</a>
       <button class="ct-btn" data-go="analisis" data-tk="${esc(t)}">Analizar</button>
-      <button class="ct-btn ${litE?'lit-e':''}" data-panel="earn" data-tk="${esc(t)}" ${litE?'':'disabled'}${eTip} title="Resultados">R</button>
-      <button class="ct-btn ${litI?'lit-i':''}" data-panel="ins" data-tk="${esc(t)}" ${litI?'':'disabled'} title="Insiders">I</button>
+      <button class="ct-btn ${litE?'lit-e':''}" data-panel="earn" data-tk="${esc(t)}" ${litE?'':'disabled'}${eTip} >R</button>
+      <button class="ct-btn ${litI?'lit-i':''}" data-panel="ins" data-tk="${esc(t)}" ${litI?'':'disabled'} >I</button>
       <span class="alert-wrap">
-        <button class="ct-btn ${litA?'lit-a':''}" data-alert="${esc(t)}" ${litA?'':'disabled'} title="Actividad inusual">⚡</button>
+        <button class="ct-btn ${litA?'lit-a':''}" data-alert="${esc(t)}" ${litA?'':'disabled'} >⚡</button>
         ${litA?`<span class="ct-tip">${alertData[t].join('<br>')}</span>`:''}
       </span>`;
   };
@@ -1554,7 +1563,7 @@ function renderCartera(){
     let list=activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort);
     const val=(p)=>({ticker:p.t,name:p.name,peso:p.peso,pl:p.plPct,port:p.port})[ctSort.col];
     list=sortear(list,val);
-    const head=`<div class="ct-row ct-head">${hd('ticker','Ticker','width:74px;flex:none')}${hd('name','Nombre','flex:0 1 240px;min-width:110px')}${hd('peso','Peso','width:56px;text-align:right;flex:none')}${hd('pl','P&L %','width:70px;text-align:right;flex:none')}${activePort==='ALL'?hd('port','Cartera','width:70px;flex:none'):''}</div>`;
+    const head=`<div class="ct-row ct-head">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:0 1 185px;min-width:100px')}${hd('peso','Peso','width:50px;text-align:right;flex:none')}${hd('pl','P&L %','width:64px;text-align:right;flex:none')}${activePort==='ALL'?hd('port','Cart.','width:58px;flex:none'):''}</div>`;
     $('#carteraBody').innerHTML=head+list.map(p=>{
       const t=p.t;
       let extra='';
@@ -1563,15 +1572,21 @@ function renderCartera(){
         if(d){const dias=Math.round((d-Date.now())/86400000);
           const epoch=Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/1000);
           const pr=primasCache[t+'|'+p.strike+'|'+epoch];
+          let vivo='';
+          if(pr&&p.contratos&&p.inv){
+            const val=pr.prima*100*p.contratos;
+            const plv=val-p.inv,pctv=plv/p.inv;
+            vivo=`<span class="ct-exp" style="background:var(--panel2)"><b class="${plv>=0?'pos':'neg'}">${(pctv>0?'+':'')+(pctv*100).toFixed(0)}%</b> vivo (${val.toLocaleString('es-ES',{maximumFractionDigits:0})}$)</span>`;
+          }
           extra=`<span class="ct-exp" style="color:${dias<90?'var(--red)':dias<180?'var(--warn)':'var(--ink3)'};background:var(--panel2)">${p.strike!=null?p.strike+'$ · ':''}${dias}d</span>`+
-                (pr?`<span class="ct-exp" style="color:var(--ink2);background:var(--panel2)" title="Prima actual del contrato (punto medio bid/ask de Yahoo)">prima ${pr.prima.toFixed(2)}$</span>`:'');}
+                (pr?`<span class="ct-exp" style="color:var(--ink2);background:var(--panel2)">prima ${pr.prima.toFixed(2)}$</span>`:'')+vivo;}
       }
       return `<div class="ct-row" data-t="${esc(t)}">
-        <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" title="Abrir en Análisis" style="cursor:pointer">${esc(t)}</span>
-        <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" title="Abrir en Análisis" style="cursor:pointer">${esc(p.name)}</span>
+        <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
+        <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(p.name)}</span>
         <span class="ct-peso">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
-        <span class="ct-pl" style="width:70px">${f(p.plPct)}</span>
-        ${activePort==='ALL'?`<span class="ct-sec" style="color:var(--amber);width:70px;flex:none;text-align:left">${esc(p.port)}</span>`:''}
+        <span class="ct-pl" style="width:64px">${f(p.plPct)}</span>
+        ${activePort==='ALL'?`<span class="ct-sec" style="color:var(--amber);width:58px;flex:none;text-align:left">${esc(p.port)}</span>`:''}
         ${extra}
         ${botones(t)}
         <div class="ct-panel" id="ctp-${esc(t)}" style="display:none"></div>
@@ -1583,7 +1598,7 @@ function renderCartera(){
   let list=activePort==='ALL'?companies:companies.filter(c=>c.port===activePort);
   const val2=(c)=>({ticker:c.yahooTicker,name:c.name})[ctSort.col]||c.name;
   list=sortear(list,val2);
-  $('#carteraBody').innerHTML=`<div class="ct-row ct-head">${hd('ticker','Ticker','width:74px;flex:none')}${hd('name','Nombre','flex:0 1 240px;min-width:110px')}</div>`+
+  $('#carteraBody').innerHTML=`<div class="ct-row ct-head">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:0 1 185px;min-width:100px')}</div>`+
     list.map(c=>{
     const t=c.yahooTicker;
     return `<div class="ct-row" data-t="${esc(t)}">
@@ -1595,31 +1610,69 @@ function renderCartera(){
   }).join('')||'<div class="sub-line" style="padding:10px 4px">Esta cartera no tiene valores.</div>';
   renderSectorSide();
 }
+let sideTab='res',secSort={col:'peso',dir:'desc'},secOpen={};
 function renderSectorSide(){
   const el=$('#sectorSide');if(!el)return;
-  if(!sheetOk){el.innerHTML='<h3>Sectores</h3><div class="sub-line">Disponible al conectar SWING 2026.</div>';return;}
-  const list=activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort);
-  const w=(p)=>activePort==='ALL'?(p.inv??0):(p.peso??0);
-  const by={};let tw=0;
-  list.forEach(p=>{const s=(p.sector||'—').toUpperCase();const wi=w(p);if(!wi)return;
-    by[s]=by[s]||{w:0,plw:0,n:0};by[s].w+=wi;if(p.plPct!=null)by[s].plw+=wi*p.plPct;by[s].n++;tw+=wi;});
-  const rows=Object.entries(by).map(([s,x])=>({s,peso:x.w/(tw||1),pl:x.w?x.plw/x.w:null,n:x.n})).sort((a,b)=>b.peso-a.peso);
+  const list=sheetOk?(activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort)):[];
+  const tset=new Set(sheetOk?list.map(p=>p.t):companies.filter(c=>activePort==='ALL'||c.port===activePort).map(c=>c.yahooTicker));
+  const resAll=[...repCurr.map(r=>({...r,sem:'Esta semana'})),...repNext.map(r=>({...r,sem:'Próxima'}))].filter(r=>tset.has(r.ticker));
+  const insKeys=Object.keys(tradesByTicker).filter(t=>tset.has(t));
+  const dot=(n)=>n?'<span class="sdot"></span>':'';
+  let bodyHtml='';
   const f=(x)=>x==null?'—':`<span class="${x>=0?'pos':'neg'}">${(x>0?'+':'')+(x*100).toFixed(1)}%</span>`;
-  const conPl=list.filter(p=>p.plPct!=null);
-  const verdes=conPl.filter(p=>p.plPct>0).length,rojas=conPl.filter(p=>p.plPct<0).length;
-  const wTot=list.reduce((a,p)=>a+w(p),0)||1;
-  const plPond=list.reduce((a,p)=>a+(p.plPct!=null?w(p)*p.plPct:0),0)/wTot;
-  const best=[...conPl].sort((a,b)=>b.plPct-a.plPct)[0];
-  const worst=[...conPl].sort((a,b)=>a.plPct-b.plPct)[0];
-  el.innerHTML=`<h3>Sectores · ${activePort==='ALL'?'todas':esc(activePort)}</h3>`+
-    rows.map(r=>`<div class="sec-w"><div class="sec-w-top"><span>${esc(r.s)}</span><span>${(r.peso*100).toFixed(1)}% · ${f(r.pl)}</span></div><div class="sec-w-bar"><i style="width:${Math.min(r.peso*100,100)}%;background:${r.pl==null?'var(--ink3)':(r.pl>=0?'var(--green)':'var(--red)')}"></i></div></div>`).join('')+
-    `<div class="rep-h" style="margin-top:14px">En breve</div>
-     <div class="rep-li">P&L ponderado: ${f(plPond)}</div>
-     <div class="rep-li">${verdes} en verde · ${rojas} en rojo</div>
-     ${best?`<div class="rep-li">Mejor: <b style="font-family:var(--mono);color:var(--amber)">${esc(best.t)}</b> ${f(best.plPct)}</div>`:''}
-     ${worst?`<div class="rep-li">Peor: <b style="font-family:var(--mono);color:var(--amber)">${esc(worst.t)}</b> ${f(worst.plPct)}</div>`:''}
-     ${rows[0]&&rows[0].peso>0.3?`<div class="rep-li" style="color:var(--warn)">⚠ ${esc(rows[0].s)} concentra el ${(rows[0].peso*100).toFixed(0)}%</div>`:''}`;
+  if(sideTab==='res'){
+    bodyHtml=resAll.length?['Esta semana','Próxima'].map(sem=>{
+      const its=resAll.filter(r=>r.sem===sem);
+      if(!its.length)return'';
+      return `<div class="rep-h">${sem}</div>`+its.map(r=>`<div class="rep-li"><b style="font-family:var(--mono);color:var(--amber)">${esc(r.ticker)}</b> ${r.date.slice(5)} <span style="color:var(--ink3)">${r.timeLabel}</span></div>`).join('');
+    }).join(''):'<div class="rep-li" style="color:var(--ink3)">Sin resultados en dos semanas.</div>';
+  }else if(sideTab==='ins'){
+    bodyHtml=insKeys.length?insKeys.map(t=>{const x=tradesByTicker[t][0];
+      return `<div class="rep-li"><b style="font-family:var(--mono);color:var(--amber)">${esc(t)}</b> <span class="${x.isSale?'neg':'pos'}">${x.isSale?'venta':'compra'} ${x.valueStr}</span></div>`;
+    }).join(''):'<div class="rep-li" style="color:var(--ink3)">Sin movimientos en 7 días.</div>';
+  }else{
+    if(!sheetOk){bodyHtml='<div class="rep-li" style="color:var(--ink3)">Con SWING 2026 conectado.</div>';}
+    else{
+      const w=(p)=>activePort==='ALL'?(p.inv??0):(p.peso??0);
+      const by={};let tw=0;
+      list.forEach(p=>{const s=(p.sector||'—').toUpperCase();const wi=w(p);if(!wi)return;
+        by[s]=by[s]||{w:0,plw:0,pos:[]};by[s].w+=wi;if(p.plPct!=null)by[s].plw+=wi*p.plPct;by[s].pos.push(p);tw+=wi;});
+      let rows=Object.entries(by).map(([s,x])=>({s,peso:x.w/(tw||1),pl:x.w?x.plw/x.w:null,pos:x.pos}));
+      const d=secSort.dir==='desc'?-1:1;
+      rows.sort((a,b)=>{const k=secSort.col;
+        if(k==='s')return a.s.localeCompare(b.s)*d;
+        return (((k==='pl'?a.pl:a.peso)??-9)-((k==='pl'?b.pl:b.peso)??-9))*d;});
+      const sh=(c,l)=>`<span class="ct-h" data-ssort="${c}">${l}${secSort.col===c?(secSort.dir==='desc'?' ▼':' ▲'):''}</span>`;
+      const top=rows.length?[...rows].sort((a,b)=>b.peso-a.peso)[0]:null;
+      bodyHtml=`<div style="display:flex;justify-content:space-between;padding:2px 0 6px">${sh('s','Sector')}<span>${sh('peso','Peso')} · ${sh('pl','P&L')}</span></div>`+
+        rows.map(r=>{
+          const open=secOpen[r.s];
+          return `<div class="sec-w" data-sec="${esc(r.s)}" style="cursor:pointer">
+            <div class="sec-w-top"><span>${open?'▾ ':'▸ '}${esc(r.s)}</span><span>${(r.peso*100).toFixed(1)}% · ${f(r.pl)}</span></div>
+            <div class="sec-w-bar"><i style="width:${Math.min(r.peso*100,100)}%;background:${r.pl==null?'var(--ink3)':(r.pl>=0?'var(--green)':'var(--red)')}"></i></div>
+          </div>`+
+          (open?r.pos.map(p=>`<div class="sec-mini"><b>${esc(p.t)}</b><span>${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span><span>${f(p.plPct)}</span></div>`).join(''):'');
+        }).join('')+
+        (top&&top.peso>0.3?`<div class="rep-li" style="color:var(--warn);margin-top:8px">⚠ ${esc(top.s)} concentra el ${(top.peso*100).toFixed(0)}%</div>`:'');
+    }
+  }
+  el.innerHTML=`<div class="side-tabs">
+    <button class="stab ${sideTab==='sec'?'active':''}" data-stab="sec">Resumen</button>
+    <button class="stab ${sideTab==='res'?'active':''}" data-stab="res">Resultados${dot(resAll.length)}</button>
+    <button class="stab ${sideTab==='ins'?'active':''}" data-stab="ins">Insiders${dot(insKeys.length)}</button>
+  </div>`+bodyHtml;
 }
+$('#sectorSide').addEventListener('click',e=>{
+  const st=e.target.closest('[data-stab]');
+  if(st){sideTab=st.dataset.stab;renderSectorSide();return;}
+  const so=e.target.closest('[data-ssort]');
+  if(so){const c=so.dataset.ssort;
+    if(secSort.col===c)secSort.dir=secSort.dir==='desc'?'asc':'desc';
+    else{secSort.col=c;secSort.dir=c==='s'?'asc':'desc';}
+    renderSectorSide();return;}
+  const sr=e.target.closest('[data-sec]');
+  if(sr){const k=sr.dataset.sec;secOpen[k]=!secOpen[k];renderSectorSide();}
+});
 async function loadPrimasOpciones(){
   if(!sheetOk||!workerUrl)return;
   if(Date.now()-primasTs<10*60*1000)return;
@@ -1877,7 +1930,7 @@ async function analizarGeneral(t){
   try{
     const [j,tsJ]=await Promise.all([
       api('/summary/'+encodeURIComponent(t)+'?modules=assetProfile,price,summaryDetail,defaultKeyStatistics,financialData,earningsHistory,incomeStatementHistory,incomeStatementHistoryQuarterly,cashflowStatementHistory,cashflowStatementHistoryQuarterly,calendarEvents,insiderTransactions'),
-      api('/timeseries/'+encodeURIComponent(t)+'?types=annualTotalRevenue,annualEBIT,annualOperatingIncome,annualFreeCashFlow,annualRepurchaseOfCapitalStock,annualCommonStockIssuance,annualInterestExpense,trailingInterestExpense,quarterlyInterestExpense,annualNetNonOperatingInterestIncomeExpense&years=10').catch(()=>null),
+      api('/timeseries/'+encodeURIComponent(t)+'?types=annualTotalRevenue,annualEBIT,annualOperatingIncome,annualFreeCashFlow,annualRepurchaseOfCapitalStock,annualCommonStockIssuance,annualInterestExpense,trailingInterestExpense,quarterlyInterestExpense,annualNetNonOperatingInterestIncomeExpense,annualInterestExpenseNonOperating,trailingFreeCashFlow&years=10').catch(()=>null),
     ]);
     const m=j?.quoteSummary?.result?.[0];
     if(!m)throw new Error('Ticker "'+t+'" sin datos');
@@ -1907,6 +1960,7 @@ async function analizarGeneral(t){
     if(!interest){const tI=tsGet('trailingInterestExpense');if(tI.length)interest=Math.abs(tI[tI.length-1]);}
     if(!interest){const qI=tsGet('quarterlyInterestExpense');if(qI.length)interest=Math.abs(qI.slice(-4).reduce((a,b)=>a+b,0));}
     if(!interest){const nI=tsGet('annualNetNonOperatingInterestIncomeExpense');if(nI.length&&nI[nI.length-1]<0)interest=Math.abs(nI[nI.length-1]);}
+    if(!interest){const oI=tsGet('annualInterestExpenseNonOperating');if(oI.length)interest=Math.abs(oI[oI.length-1]);}
     let ebitAnn=rv(annIS[0]?.ebit)??rv(annIS[0]?.operatingIncome);
     if(ebitAnn==null&&ebitA.length)ebitAnn=ebitA[ebitA.length-1];
     let buyback=rv(annCF[0]?.repurchaseOfStock);
@@ -1923,9 +1977,11 @@ async function analizarGeneral(t){
       sector:AP.sector||'',industry:AP.industry||'',summary:AP.longBusinessSummary||'',exchange:P.exchangeName||'',
       revQ,ebitQ,cfQ,revYoY:rv(FD.revenueGrowth),
       revA:revA.length?revA:null,ebitA:ebitA.length?ebitA:null,
-      fcfA:(()=>{const a=fcfA.slice();if(fcfTtm!=null&&(!a.length||Math.abs(a[a.length-1]-fcfTtm)/Math.max(Math.abs(fcfTtm),1)>0.02))a.push(fcfTtm);return a.length?a:null;})(),
+      fcfA:(()=>{const a=fcfA.slice();const tr=tsGet('trailingFreeCashFlow');const ttm=tr.length?tr[tr.length-1]:null;
+        if(ttm!=null&&(!a.length||Math.abs(a[a.length-1]-ttm)/Math.max(Math.abs(ttm),1)>0.02))a.push(ttm);return a.length?a:null;})(),
       perFwd:rv(SD.forwardPE)??rv(KS.forwardPE),
-      pfcf:(cap&&fcfTtm&&fcfTtm>0)?cap/fcfTtm:null,
+      pfcf:(()=>{const tr=tsGet('trailingFreeCashFlow');const fx=(tr.length?tr[tr.length-1]:null)??(fcfA.length?fcfA[fcfA.length-1]:null);
+        return (cap&&fx&&fx>0)?cap/fx:null;})(),
       evEbitda:rv(KS.enterpriseToEbitda),
       ndEbitda:(debt!=null&&cash!=null&&ebitda&&ebitda>0)?(debt-cash)/ebitda:null,
       cobertura:(ebitAnn&&interest>0)?ebitAnn/interest:null,
@@ -1977,7 +2033,7 @@ function renderA(){
     <button class="btn-mini" id="a_toMomentum" data-tk="${esc(t)}">→ Momentum</button>`;
   $('#a_rChips').innerHTML=(c.sector?`<span class="chip">${esc(c.sector)}</span>`:'')+(c.industry?`<span class="chip">${esc(c.industry)}</span>`:'');
   descES($('#a_rDesc'),c.summary);
-  const sa=(p)=>`https://stockanalysis.com/stocks/${t.toLowerCase()}/${p}`;
+  const sa=(p)=>`https://es.investing.com/pro/${esc(base(t))}`;
   const fmtN=(x,d=1)=>x==null?'N/D':x.toFixed(d);
   const trendCls=(imp)=>imp==='up'?'ok':imp==='down'?'ko':imp?'mid':'nd';
   const rows=[];
@@ -2254,7 +2310,7 @@ function parseTabCSV(txt,tabName){
   if(hi<0)return out;
   const col=(names)=>{for(const n of names)if(map[n]!=null)return map[n];return null;};
   const cT=col(['TICKER']),cN=col(['NOMBRE']),cP=col(['PESO']),cPL=col(['P&L','P&G']),cPct=col(['%']),cSec=col(['SECTOR']),
-        cDivi=col(['DIVISA']),cExp=col(['EXPIRACION','EXPIRACIÓN']),cStr=col(['STRIKE']),cInv=col(['INVERTIDO','USD']);
+        cDivi=col(['DIVISA']),cExp=col(['EXPIRACION','EXPIRACIÓN']),cStr=col(['STRIKE']),cInv=col(['INVERTIDO','USD']),cCon=col(['CONTRATOS','CONTRATO','N CONTRATOS']);
   let vacias=0;
   for(let i=hi+1;i<rows.length;i++){
     const r=rows[i];
@@ -2268,7 +2324,7 @@ function parseTabCSV(txt,tabName){
       peso:cP!=null?numES(r[cP]):null,pl:cPL!=null?numES(r[cPL]):null,plPct:cPct!=null?numES(r[cPct]):null,
       sector:cSec!=null?(r[cSec]||'').trim():'',divisa:cDivi!=null?(r[cDivi]||'').trim():'',
       exp:cExp!=null?(r[cExp]||'').trim():'',strike:cStr!=null?numES(r[cStr]):null,
-      inv:cInv!=null?numES(r[cInv]):null,
+      inv:cInv!=null?numES(r[cInv]):null,contratos:cCon!=null?numES(r[cCon]):null,
     });
   }
   return out;
@@ -2356,12 +2412,13 @@ function renderInforme(){
       `<div style="display:flex;gap:30px;flex-wrap:wrap;margin-top:12px">
         <div><div class="rep-h">Te empujan</div>${top.map(x=>`<div class="rep-li"><b style="font-family:var(--mono);color:var(--amber)">${esc(x.t)}</b> ${f(x.chg1)}</div>`).join('')}</div>
         <div><div class="rep-h">Te frenan</div>${bot.map(x=>`<div class="rep-li"><b style="font-family:var(--mono);color:var(--amber)">${esc(x.t)}</b> ${f(x.chg1)}</div>`).join('')}</div>
-      </div><div class="sub-line" style="margin-top:10px">Estimación con precios de Yahoo (retardo ~15 min). El P&L real es el de tu hoja; QF va apalancado y aquí no se ajusta. Úsalo como dirección, no como cifra.</div>`;
+      </div><div class="sub-line" style="margin-top:10px">1d/1s con precios Yahoo; tu P&L en vivo es el de la hoja (Google Finance). QF apalancado sin ajustar.</div>`;
   }else rend.innerHTML='<h3>Comportamiento de la cartera · 1 día / 1 semana</h3><div class="skeleton"><span class="loading"></span> Escaneando posiciones…</div>';
 
-  // --- Narrativa automática (v2: aportaciones, no obviedades) ---
+  // --- Narrativa automática (v3) ---
   const narr=$('#infNarr');
   const ps=[];
+  const OK='<span style="color:var(--green)">✅</span> ',KO='<span style="color:var(--red)">❌</span> ';
   if(sheetOk&&sectorW.length&&sectorData){
     const contribs=sectorW.map(sw=>{
       const etfN=SEC_MAP[sw.sector.toUpperCase()]||sw.sector;
@@ -2370,19 +2427,18 @@ function renderInforme(){
     }).filter(Boolean).sort((a,b)=>b.c-a.c);
     if(contribs.length>1){
       const top=contribs[0],bot=contribs[contribs.length-1];
-      const pp=(x)=>`${x>=0?'+':''}${(x*100).toFixed(2)}pp`;
-      if(top.c>0.0004||bot.c<-0.0004){
-        ps.push(`Lo que de verdad te mueve hoy: <b>${esc(top.s)}</b> te aporta ${pp(top.c)} (pesas un ${(top.peso*100).toFixed(0)}% ahí)${bot.c<0?` mientras <b>${esc(bot.s)}</b> te resta ${pp(bot.c)}`:''}. El resto es ruido.`);
-      }
+      const fp=(x)=>`${x>=0?'+':''}${(x*100).toFixed(2)}%`;
+      if(top.c>0.0004)ps.push(OK+`<b>${esc(top.s)}</b> te aporta ${fp(top.c)} hoy a la cartera (pesas un ${(top.peso*100).toFixed(0)}% ahí).`);
+      if(bot.c<-0.0004)ps.push(KO+`<b>${esc(bot.s)}</b> te resta ${fp(bot.c)} hoy.`);
       const conc=contribs.filter(x=>x.peso>0.25);
-      if(conc.length)ps.push(`⚠ Tu día depende sobre todo de ${conc.map(x=>'<b>'+esc(x.s)+'</b>').join(' y ')} (más del 25% del capital): una rotación contra ese sector te pega más a ti que al índice. Vigila si el flujo del radar empieza a salir de ahí varios días seguidos.`);
+      if(conc.length)ps.push(KO+`Tu día depende sobre todo de ${conc.map(x=>'<b>'+esc(x.s)+'</b>').join(' y ')} (más del 25% del capital): una rotación en contra te pega más a ti que al índice.`);
     }
   }
   if(sectorData){
     const s=sectorData.filter(x=>x.d1!=null);
     if(s.length>3){
       const spread=s[0].d1-s[s.length-1].d1;
-      if(spread>0.02)ps.push(`Rotación fuerte hoy: ${(spread*100).toFixed(1)} puntos entre <b>${esc(s[0].n)}</b> y <b>${esc(s[s.length-1].n)}</b>. Los días de dispersión así suelen marcar cambio de liderazgo, no ruido — merece un vistazo al radar.`);
+      if(spread>0.02)ps.push(KO+`Rotación fuerte hoy: ${(spread*100).toFixed(1)}% de diferencia entre <b>${esc(s[0].n)}</b> y <b>${esc(s[s.length-1].n)}</b>. Días así suelen marcar cambio de liderazgo — vistazo al radar.`);
     }
   }
   if(typeof radarData==='object'&&radarData&&radarData.focos&&radarData.focos.length){
@@ -2393,14 +2449,19 @@ function renderInforme(){
       coincide=focoNames.find(fn=>{const up=fn.toUpperCase();
         return [...misSec].some(ms=>ms&&(up.includes(ms.slice(0,5))||ms.includes(up.slice(0,5))));});
     }
-    ps.push(`El dinero del día se concentra en <b>${focoNames.map(esc).join('</b>, <b>')}</b>${coincide?` — y ahí tienes exposición: aprovecha para revisar tus posiciones de ese grupo`:` — nada de tu cartera juega en esa mesa hoy`}.`);
+    ps.push((coincide?OK:'')+`El dinero del día se concentra en <b>${focoNames.map(esc).join('</b>, <b>')}</b>${coincide?' — y ahí tienes exposición: revisa tus posiciones de ese grupo':' — nada de tu cartera juega en esa mesa hoy'}.`);
   }
-  const rt=rendPonderado('ALL');
-  if(rt&&rt.d1!=null&&Math.abs(rt.d1)>0.002)ps.push(`Dirección estimada de tu cartera hoy: <b class="${rt.d1>=0?'pos':'neg'}">${(rt.d1>0?'+':'')+(rt.d1*100).toFixed(2)}%</b> ponderada por el valor de cada sub-cartera.`);
+  if(sheetOk){
+    const rS=rendTab('SWING'),rO=rendTab('OPCIONES');
+    const fp2=(x)=>`<b class="${x>=0?'pos':'neg'}">${(x>0?'+':'')+(x*100).toFixed(2)}%</b>`;
+    const partes=[];
+    if(rS&&rS.d1!=null)partes.push(`SWING ${fp2(rS.d1)}`);
+    if(rO&&rO.d1!=null)partes.push(`OPCIONES ${fp2(rO.d1)} (subyacentes)`);
+    if(partes.length)ps.push(((rS&&rS.d1<-0.01)||(rO&&rO.d1<-0.01)?KO:OK)+`Tus carteras activas hoy: ${partes.join(' · ')}. CORE y QF las miro poco en el intradía — son otra guerra.`);
+  }
   const nAl=Object.keys(alertData).length;
-  if(nAl)ps.push(`⚡ ${nAl} valor${nAl>1?'es':''} tuyo${nAl>1?'s':''} con actividad inusual — el detalle está en Mi Cartera.`);
-  narr.innerHTML='<h3>Lectura del día</h3>'+(ps.length?ps.map(p=>`<p class="inf-p">${p}</p>`).join(''):'<div class="sub-line">Sin señales destacables ahora mismo — día tranquilo o datos aún cargando.</div>')+
-    '<div class="sub-line" style="margin-top:6px">Generado automáticamente cruzando sectores, radar y tus pesos. Orientativo, no es recomendación.</div>';
+  if(nAl)ps.push(KO+`${nAl} valor${nAl>1?'es':''} con actividad inusual — detalle en Mi Cartera.`);
+  narr.innerHTML='<h3>Lectura del día</h3>'+(ps.length?ps.map(p=>`<p class="inf-p">${p}</p>`).join(''):'<div class="sub-line">Día tranquilo o datos aún cargando.</div>');
 
   // --- Vencimientos de opciones ---
   const venc=$('#infVenc');
