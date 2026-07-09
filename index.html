@@ -259,13 +259,18 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .sec-w-bar{height:5px;background:var(--panel2);border-radius:3px;overflow:hidden}
 .sec-w-bar i{display:block;height:100%;border-radius:3px}
 .side-tabs{display:flex;gap:6px;margin-bottom:10px}
-.stab{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);border-radius:7px;padding:5px 10px;font-size:12px;position:relative}
+.stab{background:var(--panel);border:1px solid var(--line);color:var(--ink2);border-radius:9px;padding:7px 13px;font-size:13px;font-family:var(--disp);letter-spacing:.03em;position:relative}
 .stab.active{background:var(--amber);color:#14100A;border-color:var(--amber);font-weight:700}
 .sdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle}
 .stab.active .sdot{background:#14100A}
 .sec-mini{display:flex;gap:8px;font-family:var(--mono);font-size:11.5px;padding:2px 0 2px 16px;color:var(--ink2)}
 .sec-mini b{color:var(--amber);width:58px;font-weight:600}
 .sec-mini span{width:48px;text-align:right}
+.valchip{display:inline-block;font-family:var(--disp);font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:6px;margin-left:8px;vertical-align:middle}
+.val-cheap{background:rgba(63,185,80,.18);color:#4fd371;border:1px solid rgba(63,185,80,.4)}
+.val-fair{background:rgba(224,168,0,.15);color:var(--amber);border:1px solid rgba(224,168,0,.35)}
+.val-exp{background:rgba(248,81,73,.16);color:#ff7b72;border:1px solid rgba(248,81,73,.4)}
+.val-nd{background:var(--panel2);color:var(--ink3);border:1px solid var(--line)}
 /* ---------- Resultados semana ---------- */
 .wk-head{display:flex;align-items:center;gap:14px;cursor:pointer}
 .wk-title{font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
@@ -337,9 +342,11 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 /* ---------- Radar en dos columnas + sectores ---------- */
 .radar-grid{display:grid;grid-template-columns:minmax(0,1fr) 235px;gap:14px;align-items:start}
 #sectorMap{position:sticky;top:74px}
-.sec-tile{display:flex;justify-content:space-between;align-items:center;border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:default}
+.sec-tile{display:grid;grid-template-columns:1fr 62px 62px;align-items:center;border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:default;gap:6px}
 .sec-tile .nm{font-size:13px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.45)}
-.sec-tile .pc{font-family:var(--mono);font-size:13px;font-weight:600}
+.sec-tile .pc{font-family:var(--mono);font-size:13px;font-weight:600;text-align:right}
+.sec-head{display:grid;grid-template-columns:1fr 62px 62px;gap:6px;padding:0 12px 6px;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase}
+.sec-head span:not(:first-child){text-align:right}
 @media(max-width:900px){.radar-grid{grid-template-columns:1fr}#sectorMap{position:static}}
 
 /* ---------- Modal ---------- */
@@ -1423,11 +1430,11 @@ async function loadSectorMap(force){
       .catch(()=>({...x,d1:null,s5:null}))));
     res.sort((a,b)=>(b.d1??-9)-(a.d1??-9));
     sectorTs=Date.now();sectorData=res;
-    el.innerHTML='<h3>Sectores <span style="font-weight:400;font-size:11px;color:var(--ink3);text-transform:none;font-family:var(--mono)">1d · 1s</span></h3>'+res.map(x=>`
+    el.innerHTML='<h3>Sectores</h3><div class="sec-head"><span>Sector</span><span>1 día</span><span>1 sem</span></div>'+res.map(x=>`
       <div class="sec-tile" style="background:${heatColor(x.d1!=null?x.d1*100:null)}">
         <span class="nm">${esc(x.n)}</span>
         <span class="pc ${(x.d1??0)>=0?'pos':'neg'}">${x.d1==null?'—':(x.d1>0?'+':'')+pct(x.d1,1)}</span>
-        <span class="pc" style="opacity:.75;width:52px;text-align:right;${(x.s5??0)>=0?'color:var(--green)':'color:var(--red)'}">${x.s5==null?'—':(x.s5>0?'+':'')+pct(x.s5,1)}</span>
+        <span class="pc" style="opacity:.8;${(x.s5??0)>=0?'color:#7fe0a0':'color:#ff9a9a'}">${x.s5==null?'—':(x.s5>0?'+':'')+pct(x.s5,1)}</span>
       </div>`).join('');
   }catch(e){el.innerHTML='<h3>Sectores · hoy</h3><div class="sub-line">Error: '+esc(e.message)+'</div>';}
 }
@@ -1565,20 +1572,11 @@ function renderCartera(){
     const head=`<div class="ct-row ct-head">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:0 1 185px;min-width:100px')}${hd('peso','Peso','width:50px;text-align:right;flex:none')}${hd('pl','P&L %','width:64px;text-align:right;flex:none')}${activePort==='ALL'?hd('port','Cart.','width:58px;flex:none'):''}</div>`;
     $('#carteraBody').innerHTML=head+list.map(p=>{
       const t=p.t;
-      let extra='';
+      let vencChip='';
       if(p.port==='OPCIONES'&&p.exp){
         const d=parseExpDate(p.exp);
         if(d){const dias=Math.round((d-Date.now())/86400000);
-          const epoch=Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/1000);
-          const pr=primasCache[t+'|'+p.strike+'|'+epoch];
-          let vivo='';
-          if(pr&&p.contratos&&p.inv){
-            const val=pr.prima*100*p.contratos;
-            const plv=val-p.inv,pctv=plv/p.inv;
-            vivo=`<span class="ct-exp" style="background:var(--panel2)"><b class="${plv>=0?'pos':'neg'}">${(pctv>0?'+':'')+(pctv*100).toFixed(0)}%</b> vivo (${val.toLocaleString('es-ES',{maximumFractionDigits:0})}$)</span>`;
-          }
-          extra=`<span class="ct-exp" style="color:${dias<90?'var(--red)':dias<180?'var(--warn)':'var(--ink3)'};background:var(--panel2)">${p.strike!=null?p.strike+'$ · ':''}${dias}d</span>`+
-                (pr?`<span class="ct-exp" style="color:var(--ink2);background:var(--panel2)">prima ${pr.prima.toFixed(2)}$</span>`:'')+vivo;}
+          vencChip=`<span class="ct-exp" style="color:${dias<90?'var(--red)':dias<180?'var(--warn)':'var(--ink3)'};background:var(--panel2)">${fmtES(d)} · ${dias}d</span>`;}
       }
       return `<div class="ct-row" data-t="${esc(t)}" style="position:relative">
         <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
@@ -1586,7 +1584,7 @@ function renderCartera(){
         <span class="ct-peso">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
         <span class="ct-pl" style="width:64px">${f(p.plPct)}</span>
         ${activePort==='ALL'?`<span class="ct-sec" style="color:var(--amber);width:58px;flex:none;text-align:left">${esc(p.port)}</span>`:''}
-        ${p.port==='OPCIONES'?dataChip:''}
+        ${p.port==='OPCIONES'?vencChip:''}
         ${botones(t)}
         <div class="ct-panel" id="ctp-${esc(t)}" style="display:none"></div>
       </div>`;
@@ -1656,7 +1654,7 @@ function renderSectorSide(){
     }
   }
   el.innerHTML=`<div class="side-tabs">
-    <button class="stab ${sideTab==='sec'?'active':''}" data-stab="sec">Resumen</button>
+    <button class="stab ${sideTab==='sec'?'active':''}" data-stab="sec">Sectores</button>
     <button class="stab ${sideTab==='res'?'active':''}" data-stab="res">Resultados${dot(resAll.length)}</button>
     <button class="stab ${sideTab==='ins'?'active':''}" data-stab="ins">Insiders${dot(insKeys.length)}</button>
   </div>`+bodyHtml;
@@ -1714,10 +1712,6 @@ $('#portTabs').addEventListener('click',e=>{
   if(activePort==='OPCIONES'||activePort==='ALL')loadPrimasOpciones();
 });
 $('#carteraBody').addEventListener('click',async e=>{
-  const ex=e.target.closest('[data-expand]');
-  if(ex){const t=ex.dataset.expand;const p=$('#exp-'+esc(t));
-    if(p)p.style.display=p.style.display==='none'?'block':'none';
-    e.stopPropagation();return;}
   const sb=e.target.closest('[data-sort]');
   if(sb){const c=sb.dataset.sort;
     if(ctSort.col===c)ctSort.dir=ctSort.dir==='desc'?'asc':'desc';
@@ -1933,7 +1927,7 @@ async function analizarGeneral(t){
   try{
     const [j,tsJ]=await Promise.all([
       api('/summary/'+encodeURIComponent(t)+'?modules=assetProfile,price,summaryDetail,defaultKeyStatistics,financialData,earningsHistory,incomeStatementHistory,incomeStatementHistoryQuarterly,cashflowStatementHistory,cashflowStatementHistoryQuarterly,calendarEvents,insiderTransactions'),
-      api('/timeseries/'+encodeURIComponent(t)+'?types=annualTotalRevenue,annualEBIT,annualOperatingIncome,annualFreeCashFlow,annualRepurchaseOfCapitalStock,annualCommonStockIssuance,annualInterestExpense,trailingInterestExpense,quarterlyInterestExpense,annualNetNonOperatingInterestIncomeExpense,annualInterestExpenseNonOperating,trailingFreeCashFlow&years=10').catch(()=>null),
+      api('/timeseries/'+encodeURIComponent(t)+'?types=annualTotalRevenue,annualEBIT,annualOperatingIncome,annualFreeCashFlow,annualRepurchaseOfCapitalStock,annualCommonStockIssuance,annualInterestExpense,trailingInterestExpense,quarterlyInterestExpense,annualNetNonOperatingInterestIncomeExpense,annualInterestExpenseNonOperating,trailingFreeCashFlow,annualForwardPeRatio,annualPeRatio,annualEnterprisesValueEBITDARatio,annualPriceToFreeCashFlowsRatio,annualMarketCap&years=10').catch(()=>null),
     ]);
     const m=j?.quoteSummary?.result?.[0];
     if(!m)throw new Error('Ticker "'+t+'" sin datos');
@@ -1986,7 +1980,11 @@ async function analizarGeneral(t){
       pfcf:(()=>{const tr=tsGet('trailingFreeCashFlow');const fx=(tr.length?tr[tr.length-1]:null)??(fcfA.length?fcfA[fcfA.length-1]:null);
         return (cap&&fx&&fx>0)?cap/fx:null;})(),
       evEbitda:rv(KS.enterpriseToEbitda),
+      perHist:(()=>{const a=tsGet('annualPeRatio');return a.length>=3?a.filter(x=>x>0&&x<200):null;})(),
+      evHist:(()=>{const a=tsGet('annualEnterprisesValueEBITDARatio');return a.length>=3?a.filter(x=>x>0&&x<100):null;})(),
+      pfcfHist:(()=>{const a=tsGet('annualPriceToFreeCashFlowsRatio');return a.length>=3?a.filter(x=>x>0&&x<200):null;})(),
       ndEbitda:(debt!=null&&cash!=null&&ebitda&&ebitda>0)?(debt-cash)/ebitda:null,
+      ndFcf:(()=>{if(debt==null||cash==null)return null;const tr=tsGet('trailingFreeCashFlow');const fx=(tr.length?tr[tr.length-1]:null)??(fcfA.length?fcfA[fcfA.length-1]:null);return(fx&&fx>0)?(debt-cash)/fx:null;})(),
       cobertura:(ebitAnn&&interest>0)?ebitAnn/interest:null,
       divYield:rv(SD.dividendYield),divRate:rv(SD.dividendRate),
       buyNetPct:(cap&&(buyback!=null||issuance))?buyNet/cap:null,
@@ -2002,6 +2000,21 @@ async function analizarGeneral(t){
     }
   }catch(e){$('#a_notice').className='notice err';$('#a_notice').innerHTML='No se pudo analizar <b>'+esc(t)+'</b> — '+esc(e.message);}
   finally{btn.disabled=false;btn.textContent='Buscar';}
+}
+function media(arr){if(!arr||!arr.length)return null;return arr.reduce((a,b)=>a+b,0)/arr.length;}
+function valorar(actual,hist){
+  if(actual==null||!hist||hist.length<3)return null;
+  const m=media(hist);if(!m||m<=0)return null;
+  const ratio=actual/m;
+  if(ratio<0.85)return{txt:'BARATA',cls:'val-cheap',ratio,media:m};
+  if(ratio>1.15)return{txt:'CARA',cls:'val-exp',ratio,media:m};
+  return{txt:'EN PRECIO',cls:'val-fair',ratio,media:m};
+}
+function chipVal(v){
+  if(!v)return'';
+  const pctDif=Math.round((v.ratio-1)*100);
+  const desc=pctDif>0?`+${pctDif}% vs media`:`${pctDif}% vs media`;
+  return `<span class="valchip ${v.cls}" title="Actual vs media histórica (${v.media.toFixed(1)}x) · ${desc}">${v.txt}</span>`;
 }
 function aRow(label,rng,valHtml,cls,srcUrl,extra){
   const lbl=esc(label);
@@ -2031,12 +2044,22 @@ function renderA(){
   if(c.chgPct!=null)parts.push(`<span class="${c.chgPct>=0?'pos':'neg'}">${(c.chgPct>0?'+':'')+pct(c.chgPct)}</span>`);
   if(c.cap!=null)parts.push(money(c.cap));
   $('#a_rPrice').innerHTML=parts.join(' · ');
+  const vals=[valorar(c.perFwd,c.perHist),valorar(c.pfcf,c.pfcfHist),valorar(c.evEbitda,c.evHist)].filter(Boolean);
+  let vrChip='';
+  if(vals.length){
+    const score=vals.reduce((a,v)=>a+(v.txt==='BARATA'?-1:v.txt==='CARA'?1:0),0)/vals.length;
+    const vr=score<-0.34?{t:'BARATA',c:'val-cheap'}:score>0.34?{t:'CARA',c:'val-exp'}:{t:'EN PRECIO',c:'val-fair'};
+    vrChip=`<span class="valchip ${vr.c}" style="font-size:12px;padding:5px 12px" title="Veredicto combinando PER, P/FCF y EV/EBITDA vs sus medias históricas (${vals.length} de 3 disponibles)">Valoración: ${vr.t}</span>`;
+  }else{
+    vrChip=`<span class="valchip val-nd" style="font-size:12px;padding:5px 12px" title="Sin histórico suficiente de múltiplos">Valoración: N/D</span>`;
+  }
   $('#a_rBtns').innerHTML=`<a class="btn-mini" href="${tvUrl(t,c.exchange)}" target="_blank" rel="noopener">📈 Gráfico</a>
-    <a class="btn-mini" href="https://es.investing.com/pro/${esc(base(t))}" target="_blank" rel="noopener">Investing ↗</a>
-    <button class="btn-mini" id="a_toMomentum" data-tk="${esc(t)}">→ Momentum</button>`;
+    <a class="btn-mini" href="https://es.investing.com/search/?q=${encodeURIComponent(base(t))}" target="_blank" rel="noopener">Investing ↗</a>
+    <button class="btn-mini" id="a_toMomentum" data-tk="${esc(t)}">→ Momentum</button>
+    ${vrChip}`;
   $('#a_rChips').innerHTML=(c.sector?`<span class="chip">${esc(c.sector)}</span>`:'')+(c.industry?`<span class="chip">${esc(c.industry)}</span>`:'');
   descES($('#a_rDesc'),c.summary);
-  const sa=(p)=>`https://es.investing.com/pro/${esc(base(t))}`;
+  const sa=(p)=>`https://es.investing.com/search/?q=${encodeURIComponent(base(t))}`;
   const fmtN=(x,d=1)=>x==null?'N/D':x.toFixed(d);
   const trendCls=(imp)=>imp==='up'?'ok':imp==='down'?'ko':imp?'mid':'nd';
   const rows=[];
@@ -2045,13 +2068,15 @@ function renderA(){
   rows.push(aRow('Revenues','',(c.revYoY!=null?((c.revYoY>0?'+':'')+pct(c.revYoY)+' YoY'):(c.revA?money(c.revA[c.revA.length-1]):'N/D')),clsOf(c.revA,c.revQ),sa('financials/'),spark(c.revA,c.revQ)));
   rows.push(aRow('EBIT','',(c.ebitA?money(c.ebitA[c.ebitA.length-1]):(c.ebitQ.length?money(c.ebitQ[c.ebitQ.length-1])+'/trim':'N/D')),clsOf(c.ebitA,c.ebitQ),sa('financials/'),spark(c.ebitA,c.ebitQ)));
   rows.push(aRow('FCF','',(c.fcfA?money(c.fcfA[c.fcfA.length-1]):(c.cfQ.length?money(c.cfQ[c.cfQ.length-1])+'/trim':'N/D')),clsOf(c.fcfA,c.cfQ),sa('financials/cash-flow-statement/'),spark(c.fcfA,c.cfQ)));
-  rows.push(aRow('PER Forward','',c.perFwd!=null?fmtN(c.perFwd)+'x':'N/D',c.perFwd==null?'nd':'',sa('statistics/'),''));
-  rows.push(aRow('P/FCF','',c.pfcf!=null?fmtN(c.pfcf)+'x':'N/D',c.pfcf==null?'nd':'',sa('statistics/'),''));
-  rows.push(aRow('EV/EBITDA','',c.evEbitda!=null?fmtN(c.evEbitda)+'x':'N/D',c.evEbitda==null?'nd':'',sa('statistics/'),''));
+  const vPer=valorar(c.perFwd,c.perHist),vPfcf=valorar(c.pfcf,c.pfcfHist),vEv=valorar(c.evEbitda,c.evHist);
+  rows.push(aRow('PER Forward','',c.perFwd!=null?fmtN(c.perFwd)+'x':'N/D',c.perFwd==null?'nd':'',sa('statistics/'),chipVal(vPer)));
+  rows.push(aRow('P/FCF','',c.pfcf!=null?fmtN(c.pfcf)+'x':'N/D',c.pfcf==null?'nd':'',sa('statistics/'),chipVal(vPfcf)));
+  rows.push(aRow('EV/EBITDA','',c.evEbitda!=null?fmtN(c.evEbitda)+'x':'N/D',c.evEbitda==null?'nd':'',sa('statistics/'),chipVal(vEv)));
   rows.push(aRow('NetDebt / EBITDA','',c.ndEbitda!=null?fmtN(c.ndEbitda,2)+'x':'N/D',c.ndEbitda==null?'nd':c.ndEbitda<4?'ok':c.ndEbitda<=5?'mid':'ko',sa('statistics/')));
-  rows.push(aRow('Cobertura intereses','',fmtN(c.cobertura,1)+(c.cobertura!=null?'×':''),c.cobertura==null?'nd':c.cobertura>5?'ok':c.cobertura>=3?'mid':'ko',sa('statistics/')));
+  rows.push(aRow('Deuda Neta / FCF','',c.ndFcf!=null?fmtN(c.ndFcf,1)+'x':'N/D',c.ndFcf==null?'nd':c.ndFcf<4?'ok':c.ndFcf<=6?'mid':'ko',sa('statistics/'),c.ndFcf!=null&&c.ndFcf<0?'<span class="rng">caja neta</span>':''));
   rows.push(aRow('Dividendo','',c.divYield!=null?pct(c.divYield):'No paga',c.divYield!=null?'ok':'',sa('dividend/')));
   rows.push(aRow('Recompras','',c.buyNetPct==null?'N/D':(c.buyNetPct>0.001?'+'+pct(c.buyNetPct)+' recompra':c.buyNetPct<-0.001?pct(c.buyNetPct)+' dilución':'≈0%'),c.buyNetPct==null?'nd':c.buyNetPct>0.001?'ok':c.buyNetPct<-0.001?'ko':'',sa('financials/cash-flow-statement/')));
+  window._valActual={vPer,vPfcf,vEv};
   let resVal='N/D',resCls='nd';
   if(c.nextEarn){const days=Math.round((c.nextEarn-Date.now())/86400000);resVal=fmtES(c.nextEarn)+' ('+(days>=0?'en '+days+' días':'hace '+(-days)+' días')+')';resCls=days>=0&&days<=14?'mid':'';}
   let resExtra='';
