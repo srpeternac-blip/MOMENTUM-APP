@@ -218,7 +218,7 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .ct-acts{display:flex;align-items:center;gap:6px;flex:none;margin-left:auto}
 .ct-row:last-child{border-bottom:0}
 .ct-tick{font-family:var(--mono);font-weight:600;color:var(--amber);width:62px;flex:none;font-size:13px}
-.ct-name{flex:0 1 185px;min-width:100px;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ct-name{flex:1 1 auto;min-width:80px;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ct-btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);border-radius:7px;padding:3px 8px;font-size:11.5px;white-space:nowrap}
 .ct-btn:hover{color:var(--ink);border-color:var(--ink3)}
 .ct-btn.lit-e{color:var(--amber);border-color:var(--amber);font-weight:600}
@@ -240,6 +240,9 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .ct-pl{font-family:var(--mono);font-size:13px;font-weight:600;width:56px;text-align:right;flex:none;white-space:nowrap}
 .ct-sec{font-size:10.5px;font-family:var(--mono);color:var(--ink3);background:var(--panel2);padding:2px 7px;border-radius:5px;flex:none}
 .ct-exp{font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:5px;flex:none}
+.ct-venc{flex:none;width:52px;display:flex;justify-content:flex-end}
+.ct-venc:empty{width:0}
+.ct-cart{font-size:10.5px;font-family:var(--mono);color:var(--amber);width:56px;flex:none;text-align:left}
 .tot-bar{display:flex;flex-wrap:wrap;gap:18px;padding:10px 4px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
 .tot-item{font-size:12px;color:var(--ink3)}
 .tot-item b{display:block;font-family:var(--mono);font-size:16px;color:var(--ink);margin-top:1px}
@@ -344,11 +347,12 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 /* ---------- Radar en dos columnas + sectores ---------- */
 .radar-grid{display:grid;grid-template-columns:minmax(0,1fr) 235px;gap:14px;align-items:start}
 #sectorMap{position:sticky;top:74px}
-.sec-tile{display:grid;grid-template-columns:1fr 48px 48px;align-items:center;border-radius:8px;padding:8px 10px;margin-bottom:5px;cursor:default;gap:6px}
-.sec-tile .nm{font-size:12px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sec-tile .pc{font-family:var(--mono);font-size:11.5px;font-weight:600;text-align:right}
-.sec-head{display:grid;grid-template-columns:1fr 48px 48px;gap:6px;padding:0 10px 6px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.04em;text-transform:uppercase}
-.sec-head span:not(:first-child){text-align:right}
+.sec-tile{display:flex;align-items:center;justify-content:space-between;border-radius:7px;padding:7px 10px;margin-bottom:4px;cursor:default;gap:8px;border:1px solid var(--line);background:var(--panel2)}
+.sec-tile .nm{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto;min-width:0}
+.sec-tile .nums{display:flex;gap:10px;flex:none;font-family:var(--mono);font-size:12px;font-weight:600}
+.sec-tile .nums .pc{width:46px;text-align:right}
+.sec-head{display:flex;justify-content:flex-end;gap:10px;padding:0 10px 6px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.04em;text-transform:uppercase}
+.sec-head .pc{width:46px;text-align:right}
 @media(max-width:900px){.radar-grid{grid-template-columns:1fr}#sectorMap{position:static}}
 
 /* ---------- Modal ---------- */
@@ -1416,10 +1420,10 @@ $('#radarBox').addEventListener('click',e=>{
 });
 let sectorTs=0;
 const SECTOR_ETFS=[
-  {s:'XLK',n:'Tecnología'},{s:'XLC',n:'Comunic.'},{s:'XLY',n:'C. Discrec.'},
+  {s:'XLK',n:'Tecnología'},{s:'XLC',n:'Comunicación'},{s:'XLY',n:'Consumo Discrec.'},
   {s:'XLV',n:'Salud'},{s:'XLF',n:'Financiero'},{s:'XLI',n:'Industrial'},
-  {s:'XLE',n:'Energía'},{s:'XLB',n:'Materiales'},{s:'XLRE',n:'Inmob.'},
-  {s:'XLU',n:'Utilities'},{s:'XLP',n:'C. Básico'},
+  {s:'XLE',n:'Energía'},{s:'XLB',n:'Materiales'},{s:'XLRE',n:'Inmobiliario'},
+  {s:'XLU',n:'Utilities'},{s:'XLP',n:'Consumo Básico'},
 ];
 async function loadSectorMap(force){
   if(!workerUrl)return;
@@ -1432,11 +1436,13 @@ async function loadSectorMap(force){
       .catch(()=>({...x,d1:null,s5:null}))));
     res.sort((a,b)=>(b.d1??-9)-(a.d1??-9));
     sectorTs=Date.now();sectorData=res;
-    el.innerHTML='<h3>Sectores</h3><div class="sec-head"><span>Sector</span><span>1D</span><span>1S</span></div>'+res.map(x=>`
-      <div class="sec-tile" style="background:${heatColor(x.d1!=null?x.d1*100:null)}" title="${esc(x.n)}">
+    el.innerHTML='<h3>Sectores</h3><div class="sec-head"><span class="pc">1D</span><span class="pc">1S</span></div>'+res.map(x=>`
+      <div class="sec-tile" title="${esc(x.n)}">
         <span class="nm">${esc(x.n)}</span>
-        <span class="pc ${(x.d1??0)>=0?'pos':'neg'}">${x.d1==null?'—':(x.d1>0?'+':'')+pct(x.d1,1)}</span>
-        <span class="pc" style="opacity:.8;${(x.s5??0)>=0?'color:#7fe0a0':'color:#ff9a9a'}">${x.s5==null?'—':(x.s5>0?'+':'')+pct(x.s5,1)}</span>
+        <span class="nums">
+          <span class="pc ${(x.d1??0)>=0?'pos':'neg'}">${x.d1==null?'—':(x.d1>0?'+':'')+pct(x.d1,1)}</span>
+          <span class="pc ${(x.s5??0)>=0?'pos':'neg'}">${x.s5==null?'—':(x.s5>0?'+':'')+pct(x.s5,1)}</span>
+        </span>
       </div>`).join('');
   }catch(e){el.innerHTML='<h3>Sectores · hoy</h3><div class="sub-line">Error: '+esc(e.message)+'</div>';}
 }
@@ -1571,7 +1577,7 @@ function renderCartera(){
     let list=activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort);
     const val=(p)=>({ticker:p.t,name:p.name,peso:p.peso,pl:p.plPct,port:p.port})[ctSort.col];
     list=sortear(list,val);
-    const head=`<div class="ct-row ct-head"><div class="ct-data">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:1 1 auto;min-width:80px')}${hd('peso','Peso','width:46px;text-align:right;flex:none')}${hd('pl','P&L %','width:56px;text-align:right;flex:none')}${activePort==='ALL'?hd('port','Cart.','width:56px;flex:none'):''}</div></div>`;
+    const head=`<div class="ct-row ct-head"><div class="ct-data">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:1 1 auto;min-width:80px')}<span class="ct-venc"></span>${hd('peso','Peso','width:46px;text-align:right;flex:none')}${hd('pl','P&L %','width:56px;text-align:right;flex:none')}${activePort==='ALL'?hd('port','Cart.','width:56px;flex:none;text-align:left'):''}</div></div>`;
     $('#carteraBody').innerHTML=head+list.map(p=>{
       const t=p.t;
       let vencChip='';
@@ -1584,10 +1590,10 @@ function renderCartera(){
         <div class="ct-data">
           <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
           <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(p.name)}</span>
+          <span class="ct-venc">${p.port==='OPCIONES'?vencChip:''}</span>
           <span class="ct-peso">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
           <span class="ct-pl">${f(p.plPct)}</span>
-          ${activePort==='ALL'?`<span class="ct-sec" style="color:var(--amber);width:56px;flex:none;text-align:left">${esc(p.port)}</span>`:''}
-          ${p.port==='OPCIONES'?vencChip:''}
+          ${activePort==='ALL'?`<span class="ct-cart">${esc(p.port)}</span>`:''}
         </div>
         <div class="ct-acts">${botones(t)}</div>
         <div class="ct-panel" id="ctp-${esc(t)}" style="display:none;width:100%"></div>
