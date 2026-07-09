@@ -266,10 +266,10 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .sec-mini{display:flex;gap:8px;font-family:var(--mono);font-size:11.5px;padding:2px 0 2px 16px;color:var(--ink2)}
 .sec-mini b{color:var(--amber);width:58px;font-weight:600}
 .sec-mini span{width:48px;text-align:right}
-.valchip{display:inline-block;font-family:var(--disp);font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:6px;margin-left:8px;vertical-align:middle}
-.val-cheap{background:rgba(63,185,80,.18);color:#4fd371;border:1px solid rgba(63,185,80,.4)}
+.valchip{display:inline-flex;align-items:center;justify-content:center;text-align:center;font-family:var(--disp);font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:6px;margin-left:8px;vertical-align:middle}
+.val-cheap{background:rgba(45,212,191,.16);color:#5eead4;border:1px solid rgba(45,212,191,.42)}
 .val-fair{background:rgba(224,168,0,.15);color:var(--amber);border:1px solid rgba(224,168,0,.35)}
-.val-exp{background:rgba(248,81,73,.16);color:#ff7b72;border:1px solid rgba(248,81,73,.4)}
+.val-exp{background:rgba(244,114,182,.15);color:#f9a8d4;border:1px solid rgba(244,114,182,.4)}
 .val-nd{background:var(--panel2);color:var(--ink3);border:1px solid var(--line)}
 /* ---------- Resultados semana ---------- */
 .wk-head{display:flex;align-items:center;gap:14px;cursor:pointer}
@@ -342,10 +342,10 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 /* ---------- Radar en dos columnas + sectores ---------- */
 .radar-grid{display:grid;grid-template-columns:minmax(0,1fr) 235px;gap:14px;align-items:start}
 #sectorMap{position:sticky;top:74px}
-.sec-tile{display:grid;grid-template-columns:1fr 62px 62px;align-items:center;border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:default;gap:6px}
-.sec-tile .nm{font-size:13px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.45)}
-.sec-tile .pc{font-family:var(--mono);font-size:13px;font-weight:600;text-align:right}
-.sec-head{display:grid;grid-template-columns:1fr 62px 62px;gap:6px;padding:0 12px 6px;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase}
+.sec-tile{display:grid;grid-template-columns:1fr 54px 54px;align-items:center;border-radius:8px;padding:8px 11px;margin-bottom:5px;cursor:default;gap:4px}
+.sec-tile .nm{font-size:12.5px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-tile .pc{font-family:var(--mono);font-size:12px;font-weight:600;text-align:right}
+.sec-head{display:grid;grid-template-columns:1fr 54px 54px;gap:4px;padding:0 11px 6px;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase}
 .sec-head span:not(:first-child){text-align:right}
 @media(max-width:900px){.radar-grid{grid-template-columns:1fr}#sectorMap{position:static}}
 
@@ -1430,8 +1430,8 @@ async function loadSectorMap(force){
       .catch(()=>({...x,d1:null,s5:null}))));
     res.sort((a,b)=>(b.d1??-9)-(a.d1??-9));
     sectorTs=Date.now();sectorData=res;
-    el.innerHTML='<h3>Sectores</h3><div class="sec-head"><span>Sector</span><span>1 día</span><span>1 sem</span></div>'+res.map(x=>`
-      <div class="sec-tile" style="background:${heatColor(x.d1!=null?x.d1*100:null)}">
+    el.innerHTML='<h3>Sectores</h3><div class="sec-head"><span>Sector</span><span>1D</span><span>1S</span></div>'+res.map(x=>`
+      <div class="sec-tile" style="background:${heatColor(x.d1!=null?x.d1*100:null)}" title="${esc(x.n)}">
         <span class="nm">${esc(x.n)}</span>
         <span class="pc ${(x.d1??0)>=0?'pos':'neg'}">${x.d1==null?'—':(x.d1>0?'+':'')+pct(x.d1,1)}</span>
         <span class="pc" style="opacity:.8;${(x.s5??0)>=0?'color:#7fe0a0':'color:#ff9a9a'}">${x.s5==null?'—':(x.s5>0?'+':'')+pct(x.s5,1)}</span>
@@ -1576,7 +1576,7 @@ function renderCartera(){
       if(p.port==='OPCIONES'&&p.exp){
         const d=parseExpDate(p.exp);
         if(d){const dias=Math.round((d-Date.now())/86400000);
-          vencChip=`<span class="ct-exp" style="color:${dias<90?'var(--red)':dias<180?'var(--warn)':'var(--ink3)'};background:var(--panel2)">${fmtES(d)} · ${dias}d</span>`;}
+          vencChip=`<span class="ct-exp" style="color:${dias<90?'var(--red)':dias<180?'var(--warn)':'var(--ink3)'};background:var(--panel2)" title="Vence ${fmtES(d)}">${dias}d</span>`;}
       }
       return `<div class="ct-row" data-t="${esc(t)}" style="position:relative">
         <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
@@ -1641,7 +1641,8 @@ function renderSectorSide(){
         return (((k==='pl'?a.pl:a.peso)??-9)-((k==='pl'?b.pl:b.peso)??-9))*d;});
       const sh=(c,l)=>`<span class="ct-h" data-ssort="${c}">${l}${secSort.col===c?(secSort.dir==='desc'?' ▼':' ▲'):''}</span>`;
       const top=rows.length?[...rows].sort((a,b)=>b.peso-a.peso)[0]:null;
-      bodyHtml=`<div style="display:flex;justify-content:space-between;padding:2px 0 6px">${sh('s','Sector')}<span>${sh('peso','Peso')} · ${sh('pl','P&L')}</span></div>`+
+      const sh2=(c,l,st)=>`<span class="ct-h" data-ssort="${c}" style="${st}">${l}${secSort.col===c?(secSort.dir==='desc'?' ▼':' ▲'):''}</span>`;
+      bodyHtml=`<div class="ct-row ct-head" style="gap:6px">${sh2('s','Sector','flex:1')}${sh2('peso','Peso','width:48px;text-align:right;flex:none')}${sh2('pl','P&L','width:58px;text-align:right;flex:none')}</div>`+
         rows.map(r=>{
           const open=secOpen[r.s];
           return `<div class="sec-w" data-sec="${esc(r.s)}" style="cursor:pointer">
@@ -2054,12 +2055,12 @@ function renderA(){
     vrChip=`<span class="valchip val-nd" style="font-size:12px;padding:5px 12px" title="Sin histórico suficiente de múltiplos">Valoración: N/D</span>`;
   }
   $('#a_rBtns').innerHTML=`<a class="btn-mini" href="${tvUrl(t,c.exchange)}" target="_blank" rel="noopener">📈 Gráfico</a>
-    <a class="btn-mini" href="https://es.investing.com/search/?q=${encodeURIComponent(base(t))}" target="_blank" rel="noopener">Investing ↗</a>
+    <a class="btn-mini" href="https://es.investing.com/pro/${esc(base(t))}" target="_blank" rel="noopener">Investing ↗</a>
     <button class="btn-mini" id="a_toMomentum" data-tk="${esc(t)}">→ Momentum</button>
     ${vrChip}`;
   $('#a_rChips').innerHTML=(c.sector?`<span class="chip">${esc(c.sector)}</span>`:'')+(c.industry?`<span class="chip">${esc(c.industry)}</span>`:'');
   descES($('#a_rDesc'),c.summary);
-  const sa=(p)=>`https://es.investing.com/search/?q=${encodeURIComponent(base(t))}`;
+  const sa=(p)=>`https://es.investing.com/pro/${esc(base(t))}`;
   const fmtN=(x,d=1)=>x==null?'N/D':x.toFixed(d);
   const trendCls=(imp)=>imp==='up'?'ok':imp==='down'?'ko':imp?'mid':'nd';
   const rows=[];
