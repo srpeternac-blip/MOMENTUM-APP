@@ -258,7 +258,6 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .sec-w-top span:last-child{font-family:var(--mono);font-size:12px}
 .sec-w-bar{height:5px;background:var(--panel2);border-radius:3px;overflow:hidden}
 .sec-w-bar i{display:block;height:100%;border-radius:3px}
-#sectorSide{margin-top:37px}
 .side-tabs{display:flex;gap:6px;margin-bottom:10px}
 .stab{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);border-radius:7px;padding:5px 10px;font-size:12px;position:relative}
 .stab.active{background:var(--amber);color:#14100A;border-color:var(--amber);font-weight:700}
@@ -1581,13 +1580,13 @@ function renderCartera(){
           extra=`<span class="ct-exp" style="color:${dias<90?'var(--red)':dias<180?'var(--warn)':'var(--ink3)'};background:var(--panel2)">${p.strike!=null?p.strike+'$ · ':''}${dias}d</span>`+
                 (pr?`<span class="ct-exp" style="color:var(--ink2);background:var(--panel2)">prima ${pr.prima.toFixed(2)}$</span>`:'')+vivo;}
       }
-      return `<div class="ct-row" data-t="${esc(t)}">
+      return `<div class="ct-row" data-t="${esc(t)}" style="position:relative">
         <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
         <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(p.name)}</span>
         <span class="ct-peso">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
         <span class="ct-pl" style="width:64px">${f(p.plPct)}</span>
         ${activePort==='ALL'?`<span class="ct-sec" style="color:var(--amber);width:58px;flex:none;text-align:left">${esc(p.port)}</span>`:''}
-        ${extra}
+        ${p.port==='OPCIONES'?dataChip:''}
         ${botones(t)}
         <div class="ct-panel" id="ctp-${esc(t)}" style="display:none"></div>
       </div>`;
@@ -1610,7 +1609,7 @@ function renderCartera(){
   }).join('')||'<div class="sub-line" style="padding:10px 4px">Esta cartera no tiene valores.</div>';
   renderSectorSide();
 }
-let sideTab='res',secSort={col:'peso',dir:'desc'},secOpen={};
+let sideTab='sec',secSort={col:'peso',dir:'desc'},secOpen={};
 function renderSectorSide(){
   const el=$('#sectorSide');if(!el)return;
   const list=sheetOk?(activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort)):[];
@@ -1715,6 +1714,10 @@ $('#portTabs').addEventListener('click',e=>{
   if(activePort==='OPCIONES'||activePort==='ALL')loadPrimasOpciones();
 });
 $('#carteraBody').addEventListener('click',async e=>{
+  const ex=e.target.closest('[data-expand]');
+  if(ex){const t=ex.dataset.expand;const p=$('#exp-'+esc(t));
+    if(p)p.style.display=p.style.display==='none'?'block':'none';
+    e.stopPropagation();return;}
   const sb=e.target.closest('[data-sort]');
   if(sb){const c=sb.dataset.sort;
     if(ctSort.col===c)ctSort.dir=ctSort.dir==='desc'?'asc':'desc';
