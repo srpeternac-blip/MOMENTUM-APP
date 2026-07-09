@@ -213,7 +213,9 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 
 
 /* ---------- Cartera ---------- */
-.ct-row{display:flex;align-items:center;gap:7px;padding:6px 4px;border-bottom:1px solid var(--panel2);flex-wrap:wrap}
+.ct-row{display:flex;align-items:center;gap:7px;padding:6px 4px;border-bottom:1px solid var(--panel2);flex-wrap:nowrap;overflow:hidden}
+.ct-data{display:flex;align-items:center;gap:9px;flex:1 1 auto;min-width:0;overflow:hidden}
+.ct-acts{display:flex;align-items:center;gap:6px;flex:none;margin-left:auto}
 .ct-row:last-child{border-bottom:0}
 .ct-tick{font-family:var(--mono);font-weight:600;color:var(--amber);width:62px;flex:none;font-size:13px}
 .ct-name{flex:0 1 185px;min-width:100px;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -234,8 +236,8 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .rep-li{padding:3px 0;font-size:13.5px;line-height:1.45}
 .bar-row{display:flex;gap:10px;font-family:var(--mono);font-size:12.5px;padding:3px 0;border-bottom:1px dashed var(--panel2)}
 .bar-row span:first-child{color:var(--amber);font-weight:600;width:64px}
-.ct-peso{font-family:var(--mono);font-size:13px;color:var(--ink);font-weight:700;width:50px;text-align:right;flex:none}
-.ct-pl{font-family:var(--mono);font-size:13px;font-weight:600;width:118px;text-align:right;flex:none;white-space:nowrap}
+.ct-peso{font-family:var(--mono);font-size:13px;color:var(--ink);font-weight:700;width:46px;text-align:right;flex:none}
+.ct-pl{font-family:var(--mono);font-size:13px;font-weight:600;width:56px;text-align:right;flex:none;white-space:nowrap}
 .ct-sec{font-size:10.5px;font-family:var(--mono);color:var(--ink3);background:var(--panel2);padding:2px 7px;border-radius:5px;flex:none}
 .ct-exp{font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:5px;flex:none}
 .tot-bar{display:flex;flex-wrap:wrap;gap:18px;padding:10px 4px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
@@ -249,7 +251,7 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .cart-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
 #sectorSide{position:sticky;top:74px;max-height:calc(100vh - 90px);overflow-y:auto}
 @media(max-width:1000px){.cart-grid{grid-template-columns:1fr}#sectorSide{position:static;max-height:none}}
-.ct-head{border-bottom:1px solid var(--line)!important;padding:6px 4px!important}
+.ct-head{border-bottom:1px solid var(--line)!important;padding:6px 4px!important;overflow:visible}
 .ct-h{cursor:pointer;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;user-select:none}
 .ct-h:hover{color:var(--amber)}
 .sec-w{margin-bottom:9px}
@@ -342,10 +344,10 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 /* ---------- Radar en dos columnas + sectores ---------- */
 .radar-grid{display:grid;grid-template-columns:minmax(0,1fr) 235px;gap:14px;align-items:start}
 #sectorMap{position:sticky;top:74px}
-.sec-tile{display:grid;grid-template-columns:1fr 54px 54px;align-items:center;border-radius:8px;padding:8px 11px;margin-bottom:5px;cursor:default;gap:4px}
-.sec-tile .nm{font-size:12.5px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sec-tile .pc{font-family:var(--mono);font-size:12px;font-weight:600;text-align:right}
-.sec-head{display:grid;grid-template-columns:1fr 54px 54px;gap:4px;padding:0 11px 6px;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase}
+.sec-tile{display:grid;grid-template-columns:1fr 48px 48px;align-items:center;border-radius:8px;padding:8px 10px;margin-bottom:5px;cursor:default;gap:6px}
+.sec-tile .nm{font-size:12px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-tile .pc{font-family:var(--mono);font-size:11.5px;font-weight:600;text-align:right}
+.sec-head{display:grid;grid-template-columns:1fr 48px 48px;gap:6px;padding:0 10px 6px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.04em;text-transform:uppercase}
 .sec-head span:not(:first-child){text-align:right}
 @media(max-width:900px){.radar-grid{grid-template-columns:1fr}#sectorMap{position:static}}
 
@@ -1414,10 +1416,10 @@ $('#radarBox').addEventListener('click',e=>{
 });
 let sectorTs=0;
 const SECTOR_ETFS=[
-  {s:'XLK',n:'Tecnología'},{s:'XLC',n:'Comunicación'},{s:'XLY',n:'Consumo Discrec.'},
+  {s:'XLK',n:'Tecnología'},{s:'XLC',n:'Comunic.'},{s:'XLY',n:'C. Discrec.'},
   {s:'XLV',n:'Salud'},{s:'XLF',n:'Financiero'},{s:'XLI',n:'Industrial'},
-  {s:'XLE',n:'Energía'},{s:'XLB',n:'Materiales'},{s:'XLRE',n:'Real Estate'},
-  {s:'XLU',n:'Utilities'},{s:'XLP',n:'Consumo Básico'},
+  {s:'XLE',n:'Energía'},{s:'XLB',n:'Materiales'},{s:'XLRE',n:'Inmob.'},
+  {s:'XLU',n:'Utilities'},{s:'XLP',n:'C. Básico'},
 ];
 async function loadSectorMap(force){
   if(!workerUrl)return;
@@ -1569,7 +1571,7 @@ function renderCartera(){
     let list=activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort);
     const val=(p)=>({ticker:p.t,name:p.name,peso:p.peso,pl:p.plPct,port:p.port})[ctSort.col];
     list=sortear(list,val);
-    const head=`<div class="ct-row ct-head">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:0 1 185px;min-width:100px')}${hd('peso','Peso','width:50px;text-align:right;flex:none')}${hd('pl','P&L %','width:64px;text-align:right;flex:none')}${activePort==='ALL'?hd('port','Cart.','width:58px;flex:none'):''}</div>`;
+    const head=`<div class="ct-row ct-head"><div class="ct-data">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:1 1 auto;min-width:80px')}${hd('peso','Peso','width:46px;text-align:right;flex:none')}${hd('pl','P&L %','width:56px;text-align:right;flex:none')}${activePort==='ALL'?hd('port','Cart.','width:56px;flex:none'):''}</div></div>`;
     $('#carteraBody').innerHTML=head+list.map(p=>{
       const t=p.t;
       let vencChip='';
@@ -1579,14 +1581,16 @@ function renderCartera(){
           vencChip=`<span class="ct-exp" style="color:${dias<90?'var(--red)':dias<180?'var(--warn)':'var(--ink3)'};background:var(--panel2)" title="Vence ${fmtES(d)}">${dias}d</span>`;}
       }
       return `<div class="ct-row" data-t="${esc(t)}" style="position:relative">
-        <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
-        <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(p.name)}</span>
-        <span class="ct-peso">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
-        <span class="ct-pl" style="width:64px">${f(p.plPct)}</span>
-        ${activePort==='ALL'?`<span class="ct-sec" style="color:var(--amber);width:58px;flex:none;text-align:left">${esc(p.port)}</span>`:''}
-        ${p.port==='OPCIONES'?vencChip:''}
-        ${botones(t)}
-        <div class="ct-panel" id="ctp-${esc(t)}" style="display:none"></div>
+        <div class="ct-data">
+          <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
+          <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(p.name)}</span>
+          <span class="ct-peso">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
+          <span class="ct-pl">${f(p.plPct)}</span>
+          ${activePort==='ALL'?`<span class="ct-sec" style="color:var(--amber);width:56px;flex:none;text-align:left">${esc(p.port)}</span>`:''}
+          ${p.port==='OPCIONES'?vencChip:''}
+        </div>
+        <div class="ct-acts">${botones(t)}</div>
+        <div class="ct-panel" id="ctp-${esc(t)}" style="display:none;width:100%"></div>
       </div>`;
     }).join('')||'<div class="sub-line" style="padding:10px 4px">Esta cartera no tiene posiciones.</div>';
     renderSectorSide();
@@ -1595,14 +1599,16 @@ function renderCartera(){
   let list=activePort==='ALL'?companies:companies.filter(c=>c.port===activePort);
   const val2=(c)=>({ticker:c.yahooTicker,name:c.name})[ctSort.col]||c.name;
   list=sortear(list,val2);
-  $('#carteraBody').innerHTML=`<div class="ct-row ct-head">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:0 1 185px;min-width:100px')}</div>`+
+  $('#carteraBody').innerHTML=`<div class="ct-row ct-head"><div class="ct-data">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:1 1 auto')}</div></div>`+
     list.map(c=>{
     const t=c.yahooTicker;
     return `<div class="ct-row" data-t="${esc(t)}">
-      <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
-      <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(c.name)}</span>
-      ${botones(t)}
-      <div class="ct-panel" id="ctp-${esc(t)}" style="display:none"></div>
+      <div class="ct-data">
+        <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
+        <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(c.name)}</span>
+      </div>
+      <div class="ct-acts">${botones(t)}</div>
+      <div class="ct-panel" id="ctp-${esc(t)}" style="display:none;width:100%"></div>
     </div>`;
   }).join('')||'<div class="sub-line" style="padding:10px 4px">Esta cartera no tiene valores.</div>';
   renderSectorSide();
