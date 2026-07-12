@@ -215,15 +215,28 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 
 
 /* ---------- Cartera ---------- */
-.ct-row{display:flex;align-items:center;gap:7px;padding:7px 4px;border-bottom:1px solid var(--blue-line);flex-wrap:nowrap;overflow:hidden}
-.ct-row:hover{background:var(--blue-bg2)}
+.ct-row{display:flex;align-items:center;gap:7px;padding:7px 6px;border-bottom:1px solid rgba(42,54,68,.55);flex-wrap:nowrap;position:relative}
+.ct-row:hover{background:rgba(143,184,221,.06)}
 .ct-row.ct-head:hover{background:none}
+.ct-row:last-child{border-bottom:none}
+/* columnas redimensionables */
+#carteraBody{--w-peso:56px;--w-tick:70px;--w-name:230px;--w-mov:66px;--w-inv:90px;--w-pl:120px;--w-cart:62px}
+.cw{flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cw-peso{width:var(--w-peso)}.cw-tick{width:var(--w-tick)}.cw-name{width:var(--w-name)}
+.cw-mov{width:var(--w-mov)}.cw-inv{width:var(--w-inv)}.cw-pl{width:var(--w-pl)}.cw-cart{width:var(--w-cart)}
+.ct-h{position:relative;padding-right:6px}
+.rz{position:absolute;right:-4px;top:-4px;bottom:-4px;width:8px;cursor:col-resize;z-index:5}
+.rz:hover::after,.rz.on::after{content:'';position:absolute;left:3px;top:0;bottom:0;width:2px;background:var(--blue)}
+body.rzing{cursor:col-resize;user-select:none}
 .ct-data{display:flex;align-items:center;gap:9px;flex:1 1 auto;min-width:0;overflow:hidden}
 .ct-acts{display:flex;align-items:center;gap:6px;flex:none;margin-left:auto}
 .ct-row:last-child{border-bottom:0}
-.ct-tick{font-family:var(--mono);font-weight:600;color:var(--amber);width:62px;flex:none;font-size:13px}
-.ct-name{flex:1 1 auto;min-width:80px;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ct-btn{background:var(--blue-bg2);border:1px solid var(--blue-line);color:var(--ink2);border-radius:7px;padding:3px 8px;font-size:11.5px;white-space:nowrap;cursor:default}
+.ct-tick{font-family:var(--mono);font-weight:700;color:var(--amber);font-size:12.5px}
+.ct-name{font-size:13px}
+.ct-btn{background:var(--blue-bg2);border:1px solid var(--blue-line);color:var(--ink3);border-radius:6px;padding:2px 7px;font-size:11px;white-space:nowrap;cursor:default;min-width:24px;text-align:center;display:inline-block}
+.alert-wrap{position:relative;display:inline-block}
+.alert-wrap .ct-tip{display:none;position:absolute;right:0;bottom:calc(100% + 6px);background:#0d1117;border:1px solid var(--blue-line);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--ink2);white-space:normal;width:max-content;max-width:280px;z-index:60;box-shadow:0 8px 22px rgba(0,0,0,.55);text-align:left;line-height:1.4}
+.alert-wrap:hover .ct-tip{display:block}
 .ct-btn:hover{color:var(--ink);border-color:var(--ink3)}
 .ct-btn.lit-e{color:var(--amber);border-color:var(--amber);font-weight:600}
 .ct-btn.lit-i{color:var(--green);border-color:var(--green);font-weight:600}
@@ -261,21 +274,21 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
 .cart-hero-r{display:flex;align-items:center;gap:10px}
 .mkt-bar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:16px}
 @media(max-width:900px){.mkt-bar{grid-template-columns:repeat(3,1fr)}}
-.mkt-i{background:var(--blue-bg);border:1px solid var(--blue-line);border-radius:10px;padding:9px 11px;text-align:center}
-.mkt-i .mn{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
-.mkt-i .mv{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink)}
-.mkt-i .mc{font-family:var(--mono);font-size:12px;font-weight:600;margin-top:2px}
+.mkt-i{background:linear-gradient(180deg,var(--blue-bg2),var(--blue-bg));border:1px solid var(--blue-line);border-radius:12px;padding:11px 12px;text-align:center}
+.mkt-i .mn{font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--blue);margin-bottom:5px}
+.mkt-i .mc{font-family:var(--mono);font-size:19px;font-weight:700;line-height:1.1}
+.mkt-i .mv{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink3);margin-top:3px}
 .tabs .tab{transition:all .15s;position:relative;border-bottom:none}
 .tabs .tab.active{background:var(--blue)!important;color:#0f1620!important;border-color:var(--blue)!important;font-weight:700;z-index:2}
 .tabs .tab.active .n{color:#0f1620;opacity:.7}
 .tabs .tab.active::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--blue-bg)}
-.cart-card{padding:8px 14px;border-top-left-radius:0;margin-top:-1px;background:var(--blue-bg);border-color:var(--blue-line)}
+.cart-card{padding:4px 12px 8px;border-top-left-radius:0;margin-top:-1px;background:var(--blue-bg);border:1px solid var(--blue-line);box-shadow:0 6px 24px rgba(0,0,0,.28)}
 .cart-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
 #sectorSide{position:sticky;top:74px;max-height:calc(100vh - 90px);overflow-y:auto;display:flex;flex-direction:column;gap:12px}
 .side-card{padding:13px 15px;background:var(--blue-bg);border-color:var(--blue-line)}
 .side-card h3{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin:0 0 10px}
 @media(max-width:1000px){.cart-grid{grid-template-columns:1fr}#sectorSide{position:static;max-height:none}}
-.ct-head{border-bottom:1px solid var(--blue-line)!important;padding:6px 4px!important;overflow:visible}
+.ct-head{border-bottom:1px solid var(--blue-line)!important;padding:9px 6px!important;background:rgba(143,184,221,.05);border-radius:0 8px 0 0;margin:0 -12px;padding-left:18px!important;padding-right:18px!important}
 .ct-h{cursor:pointer;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;user-select:none;flex:none}
 .ct-h:hover{color:var(--amber)}
 .sec-w{margin-bottom:9px}
@@ -424,7 +437,7 @@ a.lbl:hover{color:var(--amber);text-decoration:none}
       <div class="cart-hero">
         <h1 class="cart-h1">MI <em>CARTERA</em></h1>
         <div class="cart-hero-r">
-          <span class="chip" id="carteraStatus">cargando…</span>
+          <span id="carteraStatus" style="display:none"></span>
           <button class="btn-mini" id="btnRefCartera">Actualizar</button>
         </div>
       </div>
@@ -1699,86 +1712,113 @@ async function loadMercado(){
     el.innerHTML=res.map(x=>{
       const val=x.v==null?'—':(x.s==='BTC-USD'||x.s==='^GSPC'||x.s==='^IXIC'||x.s==='^RUT')?Math.round(x.v).toLocaleString('es-ES'):x.v.toFixed(2);
       const cls=(x.d??0)>=0?'pos':'neg';
-      return `<div class="mkt-i"><div class="mn">${esc(x.n)}</div><div class="mv">${val}</div><div class="mc ${cls}">${x.d==null?'—':((x.d>0?'+':'')+(x.d*100).toFixed(2)+'%')}</div></div>`;
+      return `<div class="mkt-i"><div class="mn">${esc(x.n)}</div><div class="mc ${cls}">${x.d==null?'—':((x.d>0?'+':'')+(x.d*100).toFixed(2)+'%')}</div><div class="mv">${val}</div></div>`;
     }).join('');
   }catch(e){el.innerHTML='<div class="sub-line" style="padding:8px">No se pudo cargar el mercado.</div>';}
 }
 function renderCartera(){
   renderPortTabs();
   const fPct=(x)=>x==null?'—':`<span class="${x>=0?'pos':'neg'}">${(x>0?'+':'')+(x*100).toFixed(1)}%</span>`;
-  const fEur=(x)=>x==null?'':`<span class="${x>=0?'pos':'neg'}" style="font-size:11px;opacity:.85">${(x>0?'+':'')+Math.round(x).toLocaleString('es-ES')}</span>`;
+  const fEur=(x)=>x==null?'':`<b class="${x>=0?'pos':'neg'}">${(x>0?'+':'')+Math.round(x).toLocaleString('es-ES')}€</b>`;
   const botones=(t)=>{
     const litE=earningsAlerts.has(t),litI=insiderAlerts.has(t),litA=!!alertData[t];
-    const tipE=litE&&earnInfo[t]?earnInfo[t]:'Sin resultados próximos';
-    const insT=tradesByTicker[t]?.[0];
-    const tipI=litI&&insT?`${insT.isSale?'Venta':'Compra'} ${insT.valueStr}`:'Sin movimientos de insiders';
-    const tipA=litA?alertData[t].join(' · '):'Sin actividad inusual';
-    return `<span class="alert-wrap"><span class="ct-btn ${litE?'lit-e':''}">R</span><span class="ct-tip">${esc(tipE)}</span></span>
-      <span class="alert-wrap"><span class="ct-btn ${litI?'lit-i':''}">I</span><span class="ct-tip">${esc(tipI)}</span></span>
-      <span class="alert-wrap"><span class="ct-btn ${litA?'lit-a':''}">⚡</span><span class="ct-tip">${litA?alertData[t].join('<br>'):esc(tipA)}</span></span>`;
+    const ins=tradesByTicker[t]?.[0];
+    const wrap=(lit,cls,txt,tip)=>lit
+      ? `<span class="alert-wrap"><span class="ct-btn ${cls}">${txt}</span><span class="ct-tip">${tip}</span></span>`
+      : `<span class="ct-btn">${txt}</span>`;
+    return wrap(litE,'lit-e','R',esc(earnInfo[t]||'Presenta resultados pronto'))+
+      wrap(litI,'lit-i','I',ins?`<b>${ins.isSale?'Venta':'Compra'}</b> de insider · ${esc(ins.valueStr||'')}`:'Movimiento de insider')+
+      wrap(litA,'lit-a','⚡',(alertData[t]||[]).join('<br>'));
   };
-  const hd=(col,label,style)=>`<span class="ct-h" data-sort="${col}" style="${style}">${label}${ctSort.col===col?(ctSort.dir==='desc'?' ▼':' ▲'):''}</span>`;
+  const hd=(col,label)=>`<span class="ct-h cw cw-${col}" data-sort="${col}">${label}${ctSort.col===col?(ctSort.dir==='desc'?' ▼':' ▲'):''}<i class="rz" data-rz="${col}"></i></span>`;
   const sortear=(arr,val)=>{
     const d=ctSort.dir==='desc'?-1:1;
     return [...arr].sort((a,b)=>{const va=val(a),vb=val(b);
       if(typeof va==='string'&&typeof vb==='string')return va.localeCompare(vb)*d;
       return ((va??-9e9)-(vb??-9e9))*d;});
   };
-  const W={peso:'52px',tick:'62px',mov:'62px',inv:'82px',pl:'96px',cart:'56px'};
   const fantasma='<div class="ct-acts" style="visibility:hidden"><span class="ct-btn">R</span><span class="ct-btn">I</span><span class="ct-btn">⚡</span></div>';
   if(sheetOk){
     let list=activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort);
-    const val=(p)=>({peso:p.peso,ticker:p.t,name:p.name,mov:(carteraMetrics[p.t]||{}).chg1,inv:p.inv,pl:(plVivo(p)?.pct??p.plPct),port:p.port})[ctSort.col];
+    const plDe=(p)=>{const v=plVivo(p);return{pct:v?v.pct:p.plPct,eur:v?v.eur:p.pl,vivo:!!v};};
+    const val=(p)=>({peso:p.peso,ticker:p.t,name:p.name,mov:(carteraMetrics[p.t]||{}).chg1,inv:p.inv,pl:plDe(p).pct,port:p.port})[ctSort.col];
     list=sortear(list,val);
     const head=`<div class="ct-row ct-head"><div class="ct-data">`+
-      hd('peso','Peso',`width:${W.peso};text-align:right;flex:none`)+
-      hd('ticker','Ticker',`width:${W.tick};flex:none`)+
-      hd('name','Nombre','flex:1 1 auto;min-width:80px')+
-      hd('mov','Hoy',`width:${W.mov};text-align:right;flex:none`)+
-      hd('inv','Invertido',`width:${W.inv};text-align:right;flex:none`)+
-      hd('pl','P&L',`width:${W.pl};text-align:right;flex:none`)+
-      (activePort==='ALL'?hd('port','Cart.',`width:${W.cart};flex:none;text-align:left`):'')+
+      hd('peso','Peso')+hd('tick','Ticker')+hd('name','Nombre')+hd('mov','Hoy')+hd('inv','Invertido')+hd('pl','P&L')+
+      (activePort==='ALL'?hd('cart','Cart.'):'')+
       `</div>${fantasma}</div>`;
     $('#carteraBody').innerHTML=head+list.map(p=>{
-      const t=p.t,mov=(carteraMetrics[t]||{}).chg1;
-      const pv=plVivo(p);
-      const plPct=pv?pv.pct:p.plPct;
-      const plEur=pv?pv.eur:((p.inv!=null&&p.plPct!=null)?p.inv*p.plPct:null);
-      let vivoTip='';
+      const t=p.t,mov=(carteraMetrics[t]||{}).chg1,q=plDe(p);
+      let tip='';
       if(p.port==='OPCIONES'){
-        vivoTip=pv
-          ? ` title="En vivo · prima ${pv.prima.toFixed(2)}$ × ${p.contratos} contrato${p.contratos===1?'':'s'} = ${Math.round(pv.valor).toLocaleString('es-ES')}$"`
-          : ' title="Sin prima en vivo — se muestra el valor de tu hoja"';
+        const v=plVivo(p);
+        tip=v?` title="En vivo · prima ${v.prima.toFixed(2)}$ × ${p.contratos} contrato${p.contratos===1?'':'s'} = ${Math.round(v.valor).toLocaleString('es-ES')}$"`
+             :' title="Valor de tu hoja (sin prima en vivo)"';
       }
       return `<div class="ct-row" data-t="${esc(t)}">
         <div class="ct-data">
-          <span class="ct-peso" style="width:${W.peso}">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
-          <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer;width:${W.tick}">${esc(t)}</span>
-          <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(p.name)}</span>
-          <span class="ct-mov" style="width:${W.mov}">${fPct(mov)}</span>
-          <span class="ct-inv" style="width:${W.inv}">${p.inv!=null?Math.round(p.inv).toLocaleString('es-ES'):'—'}</span>
-          <span class="ct-pl" style="width:${W.pl}"${vivoTip}>${fPct(plPct)} ${fEur(plEur)}${p.port==='OPCIONES'&&!pv?'<span style="color:var(--warn);font-size:10px">*</span>':''}</span>
-          ${activePort==='ALL'?`<span class="ct-cart" style="width:${W.cart}">${esc(p.port)}</span>`:''}
+          <span class="ct-peso cw cw-peso">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
+          <span class="ct-tick cw cw-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
+          <span class="ct-name cw cw-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(p.name)}</span>
+          <span class="ct-mov cw cw-mov">${fPct(mov)}</span>
+          <span class="ct-inv cw cw-inv">${p.inv!=null?Math.round(p.inv).toLocaleString('es-ES'):'—'}</span>
+          <span class="ct-pl cw cw-pl"${tip}>${fEur(q.eur)} ${fPct(q.pct)}${p.port==='OPCIONES'&&!q.vivo?'<span style="color:var(--warn);font-size:10px">*</span>':''}</span>
+          ${activePort==='ALL'?`<span class="ct-cart cw cw-cart">${esc(p.port)}</span>`:''}
         </div>
         <div class="ct-acts">${botones(t)}</div>
       </div>`;
-    }).join('')||'<div class="sub-line" style="padding:10px 4px">Esta cartera no tiene posiciones.</div>';
+    }).join('')||'<div class="sub-line" style="padding:12px 4px">Esta cartera no tiene posiciones.</div>';
+    aplicarAnchos();
     renderSectorSide();
     return;
   }
   let list=activePort==='ALL'?companies:companies.filter(c=>c.port===activePort);
-  list=sortear(list,(c)=>({ticker:c.yahooTicker,name:c.name})[ctSort.col]||c.name);
-  $('#carteraBody').innerHTML=`<div class="ct-row ct-head"><div class="ct-data">${hd('ticker','Ticker','width:62px;flex:none')}${hd('name','Nombre','flex:1 1 auto')}</div>${fantasma}</div>`+
+  list=sortear(list,(c)=>({tick:c.yahooTicker,name:c.name})[ctSort.col]||c.name);
+  $('#carteraBody').innerHTML=`<div class="ct-row ct-head"><div class="ct-data">${hd('tick','Ticker')}${hd('name','Nombre')}</div>${fantasma}</div>`+
     list.map(c=>{const t=c.yahooTicker;
     return `<div class="ct-row" data-t="${esc(t)}">
       <div class="ct-data">
-        <span class="ct-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer;width:62px">${esc(t)}</span>
-        <span class="ct-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(c.name)}</span>
+        <span class="ct-tick cw cw-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
+        <span class="ct-name cw cw-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(c.name)}</span>
       </div>
       <div class="ct-acts">${botones(t)}</div>
-    </div>`;}).join('')||'<div class="sub-line" style="padding:10px 4px">Esta cartera no tiene valores.</div>';
+    </div>`;}).join('')||'<div class="sub-line" style="padding:12px 4px">Esta cartera no tiene valores.</div>';
+  aplicarAnchos();
   renderSectorSide();
 }
+/* --- Columnas redimensionables (se guardan) --- */
+const LS_COLW='pit_colw_v1';
+const COLW_DEF={peso:56,tick:70,name:230,mov:66,inv:90,pl:120,cart:62};
+function getColW(){try{return{...COLW_DEF,...JSON.parse(localStorage.getItem(LS_COLW)||'{}')};}catch(e){return{...COLW_DEF};}}
+function aplicarAnchos(){
+  const b=$('#carteraBody');if(!b)return;
+  const w=getColW();
+  Object.entries(w).forEach(([k,v])=>b.style.setProperty('--w-'+k,v+'px'));
+}
+(function initResize(){
+  let act=null,x0=0,w0=0;
+  document.addEventListener('mousedown',e=>{
+    const h=e.target.closest('[data-rz]');if(!h)return;
+    e.preventDefault();e.stopPropagation();
+    act=h.dataset.rz;x0=e.clientX;w0=getColW()[act];
+    h.classList.add('on');document.body.classList.add('rzing');
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!act)return;
+    const nw=Math.max(38,w0+(e.clientX-x0));
+    const b=$('#carteraBody');if(b)b.style.setProperty('--w-'+act,nw+'px');
+  });
+  document.addEventListener('mouseup',()=>{
+    if(!act)return;
+    const b=$('#carteraBody');
+    const nw=parseInt(b.style.getPropertyValue('--w-'+act))||COLW_DEF[act];
+    const w=getColW();w[act]=nw;
+    try{localStorage.setItem(LS_COLW,JSON.stringify(w));}catch(e){}
+    document.querySelectorAll('.rz.on').forEach(el=>el.classList.remove('on'));
+    document.body.classList.remove('rzing');
+    act=null;
+  });
+})();
 let secSort={col:'peso',dir:'desc'},secOpen={};
 function renderSectorSide(){
   const list=sheetOk?(activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort)):[];
@@ -2441,6 +2481,25 @@ function numES(s){
   const n=parseFloat(s);if(isNaN(n))return null;
   return pct?n/100:n;
 }
+// Dinero: el CSV español usa el punto como separador de MILES ("1.435" = 1435)
+function numMoney(s){
+  if(s==null)return null;s=String(s).trim();if(!s||s==='-'||s==='—')return null;
+  s=s.replace(/[€$%\s]/g,'');
+  const neg=/^-/.test(s);s=s.replace(/^-/,'');
+  const hasC=s.includes(','),hasD=s.includes('.');
+  if(hasC&&hasD){
+    if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\./g,'').replace(',','.');
+    else s=s.replace(/,/g,'');
+  }else if(hasC){ s=s.replace(',','.'); }
+  else if(hasD){
+    const p=s.split('.');
+    // 1.234.567 → miles ; 1.435 (entero + 3 dígitos) → miles ; 73.32 / 0.083 → decimal
+    if(p.length>2)s=s.replace(/\./g,'');
+    else if(p[1].length===3&&p[0].length<=3&&p[0]!=='0')s=s.replace('.','');
+  }
+  const n=parseFloat(s);if(isNaN(n))return null;
+  return neg?-n:n;
+}
 function parseTabCSV(txt,tabName){
   const rows=txt.split('\n').map(parseCSVLine);
   const out={pos:[],tot:null,cash:null};
@@ -2463,7 +2522,7 @@ function parseTabCSV(txt,tabName){
   if(hi<0)return out;
   const col=(names)=>{for(const n of names)if(map[n]!=null)return map[n];return null;};
   const cT=col(['TICKER']),cN=col(['NOMBRE']),cP=col(['PESO']),cPL=col(['P&L','P&G']),cPct=col(['%']),cSec=col(['SECTOR']),
-        cDivi=col(['DIVISA']),cExp=col(['EXPIRACION','EXPIRACIÓN']),cStr=col(['STRIKE']),cCon=col(['CONTRATOS','CONTRATO','N CONTRATOS']);
+        cDivi=col(['DIVISA']),cExp=col(['EXPIRACION','EXPIRACIÓN']),cStr=col(['STRIKE']),cCon=col(['Nº','N°','No','CONTRATOS','Nº CONTRATOS']);
   // Invertido: en SWING/CORE la columna ya convertida a USD; en OPCIONES/QF, INVERTIDO
   const cInv=(tabName==='SWING'||tabName==='CORE')?(col(['USD'])??col(['INVERTIDO'])):(col(['INVERTIDO'])??col(['USD']));
   let vacias=0;
@@ -2476,10 +2535,10 @@ function parseTabCSV(txt,tabName){
     if(!tick)continue;
     out.pos.push({
       orig:tick,t:toYahoo(tick),name:nom||tick,port:tabName,
-      peso:cP!=null?numES(r[cP]):null,pl:cPL!=null?numES(r[cPL]):null,plPct:cPct!=null?numES(r[cPct]):null,
+      peso:cP!=null?numES(r[cP]):null,pl:cPL!=null?numMoney(r[cPL]):null,plPct:cPct!=null?numES(r[cPct]):null,
       sector:cSec!=null?(r[cSec]||'').trim():'',divisa:cDivi!=null?(r[cDivi]||'').trim():'',
       exp:cExp!=null?(r[cExp]||'').trim():'',strike:cStr!=null?numES(r[cStr]):null,
-      inv:cInv!=null?numES(r[cInv]):null,contratos:cCon!=null?numES(r[cCon]):null,
+      inv:cInv!=null?numMoney(r[cInv]):null,contratos:cCon!=null?numES(r[cCon]):null,
     });
   }
   return out;
