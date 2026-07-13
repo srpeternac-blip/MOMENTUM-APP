@@ -234,9 +234,10 @@ body.rzing *{cursor:col-resize!important}
 .ct-data{display:flex;align-items:center;gap:9px;flex:1 1 auto;min-width:0;overflow:hidden}
 .ct-acts{display:flex;align-items:center;gap:6px;flex:none;margin-left:auto}
 .ct-row:last-child{border-bottom:0}
-.ct-tick{font-family:var(--mono);font-weight:700;color:var(--amber);font-size:12.5px}
+.ct-tick{font-family:var(--mono);font-weight:700;color:var(--amber);font-size:12.5px;text-align:center}
 .ct-name{font-size:13px}
-.ct-btn{background:var(--blue-bg2);border:1px solid var(--blue-line);color:var(--ink3);border-radius:6px;padding:2px 7px;font-size:11px;white-space:nowrap;cursor:default;min-width:24px;text-align:center;display:inline-block}
+.ct-btn{background:var(--blue-bg2);border:1px solid var(--blue-line);color:var(--ink3);border-radius:6px;padding:2px 7px;font-size:11px;white-space:nowrap;cursor:default;min-width:24px;text-align:center;display:inline-block;text-decoration:none}
+a.ct-btn{cursor:pointer}
 .alert-wrap{position:relative;display:inline-block}
 .alert-wrap .ct-tip{display:none;position:absolute;right:-8px;bottom:calc(100% + 10px);background:#e9f1fa;border:1px solid var(--blue);border-radius:10px;padding:10px 14px;font-size:12.5px;font-family:var(--sans);color:#16202b;font-weight:500;white-space:normal;width:max-content;max-width:270px;min-width:130px;z-index:90;box-shadow:0 12px 32px rgba(0,0,0,.65);text-align:center;line-height:1.5}
 .alert-wrap .ct-tip b{color:#0d1520}
@@ -256,12 +257,13 @@ body.rzing *{cursor:col-resize!important}
 .rep-li{padding:3px 0;font-size:13.5px;line-height:1.45}
 .bar-row{display:flex;gap:10px;font-family:var(--mono);font-size:12.5px;padding:3px 0;border-bottom:1px dashed var(--panel2)}
 .bar-row span:first-child{color:var(--amber);font-weight:600;width:64px}
-.ct-peso{font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:700;text-align:right}
-.ct-mov{font-family:var(--mono);font-size:12.5px;font-weight:600;text-align:right}
+.ct-peso{font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:700;text-align:center}
+.ct-mov{font-family:var(--mono);font-size:12.5px;font-weight:600;text-align:center}
 .ct-mov .pre{opacity:.55;font-style:italic}
-.ct-inv{font-family:var(--mono);font-size:12.5px;color:var(--ink2);text-align:right}
-.ct-pl{font-family:var(--mono);font-size:12.5px;font-weight:600;text-align:right;white-space:nowrap}
+.ct-inv{font-family:var(--mono);font-size:12.5px;color:var(--ink2);text-align:center}
+.ct-pl{font-family:var(--mono);font-size:12.5px;font-weight:600;text-align:center;white-space:nowrap}
 .ct-pl b{font-weight:700}
+.cw-pl{display:flex;gap:6px;justify-content:center;align-items:baseline}
 .ct-cart{font-size:10.5px;font-family:var(--mono);color:var(--blue);text-align:left}
 .ct-sec{font-size:10.5px;font-family:var(--mono);color:var(--ink3);background:var(--panel2);padding:2px 7px;border-radius:5px;flex:none}
 .ct-exp{font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:5px;flex:none}
@@ -1721,11 +1723,11 @@ async function loadPrimasOpciones(){
   });
   if(nuevas)renderCartera();
 }
-const MKT=[{n:'S&P fut',s:'ES=F'},{n:'Nasdaq fut',s:'NQ=F'},{n:'Russell fut',s:'RTY=F'},{n:'VIX',s:'^VIX'},{n:'Oro',s:'GC=F'},{n:'WTI',s:'CL=F'},{n:'Bitcoin',s:'BTC-USD'}];
+const MKT=[{n:'S&P 500',s:'ES=F'},{n:'Nasdaq',s:'NQ=F'},{n:'Russell',s:'RTY=F'},{n:'VIX',s:'^VIX'},{n:'Oro',s:'GC=F'},{n:'WTI',s:'CL=F'},{n:'Bitcoin',s:'BTC-USD'}];
 async function loadMercado(){
   const el=$('#mktBar');if(!el||!workerUrl)return;
   try{
-    const res=await Promise.all(MKT.map(x=>api('/chart/'+encodeURIComponent(x.s)+'?range=1d&interval=5m')
+    const res=await Promise.all(MKT.map(x=>api('/chart/'+encodeURIComponent(x.s)+'?range=1d&interval=5m&fresh='+Math.floor(Date.now()/60000))
       .then(j=>{
         const r0=j?.chart?.result?.[0],meta=r0?.meta||{};
         const cl=(r0?.indicators?.quote?.[0]?.close||[]).filter(v=>v!=null);
@@ -1748,12 +1750,13 @@ function renderCartera(){
   const botones=(t)=>{
     const litE=earningsAlerts.has(t),litI=insiderAlerts.has(t),litA=!!alertData[t];
     const ins=tradesByTicker[t]?.[0];
-    const wrap=(lit,cls,txt,tip)=>lit
-      ? `<span class="alert-wrap"><span class="ct-btn ${cls}">${txt}</span><span class="ct-tip">${tip}</span></span>`
+    const b=base(t).toLowerCase();
+    const wrap=(lit,cls,txt,tip,url)=>lit
+      ? `<span class="alert-wrap"><a class="ct-btn ${cls}" href="${url}" target="_blank" rel="noopener">${txt}</a><span class="ct-tip">${tip}</span></span>`
       : `<span class="ct-btn">${txt}</span>`;
-    return wrap(litE,'lit-e','R',esc(earnInfo[t]||'Presenta resultados pronto'))+
-      wrap(litI,'lit-i','I',ins?`<b>${ins.isSale?'Venta':'Compra'}</b> de insider · ${esc(ins.valueStr||'')}`:'Movimiento de insider')+
-      wrap(litA,'lit-a','⚡',(alertData[t]||[]).join('<br>'));
+    return wrap(litE,'lit-e','R',esc(earnInfo[t]||'Presenta resultados pronto'),`https://www.nasdaq.com/market-activity/stocks/${b}/earnings`)+
+      wrap(litI,'lit-i','I',ins?`<b>${ins.isSale?'Venta':'Compra'}</b> de insider · ${esc(ins.valueStr||'')}`:'Movimiento de insider',`https://www.nasdaq.com/market-activity/stocks/${b}/insider-activity`)+
+      wrap(litA,'lit-a','⚡',(alertData[t]||[]).join('<br>'),`https://finance.yahoo.com/quote/${encodeURIComponent(t)}`);
   };
   const hd=(col,label)=>`<span class="ct-h cw cw-${col}" data-sort="${col}">${label}${ctSort.col===col?(ctSort.dir==='desc'?' ▼':' ▲'):''}<i class="rz" data-rz="${col}"></i></span>`;
   const sortear=(arr,val)=>{
@@ -1774,7 +1777,7 @@ function renderCartera(){
     $('#carteraBody').innerHTML=head+list.map(p=>{
       const t=p.t,mm=carteraMetrics[p.t]||{},q=plDe(p);
       const mov=mm.chgLive??mm.chg1;
-      const movHtml=mov==null?'—':`<span class="${mov>=0?'pos':'neg'}${mm.isPre?' pre':''}"${mm.isPre?' title="Premarket — la sesión aún no ha abierto"':''}>${(mov>0?'+':'')+(mov*100).toFixed(1)}%${mm.isPre?'<sup style="font-size:8px"> pm</sup>':''}</span>`;
+      const movHtml=mov==null?'—':`<span class="${mov>=0?'pos':'neg'}${mm.isPre?' pre':''}">${(mov>0?'+':'')+(mov*100).toFixed(1)}%</span>`;
       let tip='';
       if(p.port==='OPCIONES'){
         const v=plVivo(p);
@@ -1896,18 +1899,11 @@ function renderSectorSide(){
   const iEl=$('#sideInsiders');
   if(iEl){
     const keys=Object.keys(tradesByTicker).filter(t=>tset.has(t));
-    const rec=keys.filter(t=>tradesByTicker[t].some(x=>x.en7d));
-    const linea=(t,x,conFecha)=>`<div class="rep-li"><b style="font-family:var(--mono);color:var(--blue)">${esc(t)}</b> <span class="${x.isSale?'neg':'pos'}">${x.isSale?'venta':'compra'} ${esc(x.valueStr||'')}</span>${conFecha?` <span style="color:var(--ink3);font-size:11px">${esc(x.date.slice(0,5))}</span>`:''}</div>`;
-    let inner;
-    if(rec.length){
-      inner=rec.map(t=>linea(t,tradesByTicker[t].filter(x=>x.en7d)[0],false)).join('');
-    }else if(keys.length){
-      const ult=keys.map(t=>({t,x:tradesByTicker[t][0]})).sort((a,b)=>a.x.diff-b.x.diff).slice(0,6);
-      inner='<div class="sub-line" style="margin-bottom:6px">Nada en 7 días. Últimos 30:</div>'+ult.map(({t,x})=>linea(t,x,true)).join('');
-    }else{
-      inner='<div class="sub-line">Sin movimientos.</div>';
-    }
-    iEl.innerHTML='<h3>Insiders</h3>'+inner;
+    iEl.innerHTML='<h3>Insiders</h3>'+(keys.length?
+      keys.map(t=>{const x=tradesByTicker[t][0];
+        return `<div class="rep-li"><b style="font-family:var(--mono);color:var(--blue)">${esc(t)}</b> <span class="${x.isSale?'neg':'pos'}">${x.isSale?'venta':'compra'} ${esc(x.valueStr||'')}</span></div>`;
+      }).join('')
+      :'<div class="sub-line">Sin movimientos.</div>');
   }
 }
 let activePort=localStorage.getItem('pit_cartera_filter')||'ALL';
@@ -2066,7 +2062,7 @@ async function fetchInsidersCartera(isBg=false){
   const btn=$('#btnInsiders');if(!isBg){btn.disabled=true;btn.textContent='⏳ Conectando…';}
   const usT=companies.filter(c=>!c.yahooTicker.includes('.'));
   const container=$('#insidersContainer');
-  tradesByTicker={};let total=0;const maxDays=30,nowMs=Date.now();
+  tradesByTicker={};let total=0;const maxDays=7,nowMs=Date.now();
   await pool(usT,6,async(comp)=>{
     try{
       const json=await fetchNasdaq(`company/${base(comp.yahooTicker).toLowerCase()}/insider-trades?limit=50&type=ALL`);
@@ -2077,7 +2073,6 @@ async function fetchInsidersCartera(isBg=false){
         const dp=row.lastDate.split('/');if(dp.length!==3)return;
         const rd=new Date(`${dp[2]}-${dp[0]}-${dp[1]}`);
         const diff=(nowMs-rd.getTime())/86400000;if(diff>maxDays||diff<0)return;
-        const en7d=diff<=7;
         const type=row.transactionType.toLowerCase();
         const isSale=type.includes('sell')||type.includes('sale');
         const isBuy=type.includes('buy')||type.includes('purchase');
@@ -2089,12 +2084,12 @@ async function fetchInsidersCartera(isBg=false){
         let relevance='Media',relColor='var(--warn)';
         if(v>=100000){relevance='Considerable';relColor='var(--amber)';}
         else if(v<10000){relevance='Ridícula';relColor='var(--ink3)';}
-        valid.push({date:`${dp[1].padStart(2,'0')}/${dp[0].padStart(2,'0')}/${dp[2]}`,en7d,diff,insider:row.insider||'Desconocido',title:row.relation||'—',isSale,price:row.lastPrice?'$'+row.lastPrice:'—',qty:row.sharesTraded||'—',valueNum:v,valueStr:'$'+v.toLocaleString('en-US',{maximumFractionDigits:0}),relevance,relColor});
+        valid.push({date:`${dp[1].padStart(2,'0')}/${dp[0].padStart(2,'0')}/${dp[2]}`,insider:row.insider||'Desconocido',title:row.relation||'—',isSale,price:row.lastPrice?'$'+row.lastPrice:'—',qty:row.sharesTraded||'—',valueNum:v,valueStr:'$'+v.toLocaleString('en-US',{maximumFractionDigits:0}),relevance,relColor});
       });
       if(valid.length){tradesByTicker[comp.yahooTicker]=valid.sort((a,b)=>b.valueNum-a.valueNum);total+=valid.length;}
     }catch(e){}
   });
-  insiderAlerts=new Set(Object.keys(tradesByTicker).filter(t=>tradesByTicker[t].some(x=>x.en7d)));
+  insiderAlerts=new Set(Object.keys(tradesByTicker));
   renderCartera();
   if(!Object.keys(tradesByTicker).length){container.innerHTML='<div class="card"><p class="sub-line">No hay operaciones >$1.000 en los últimos 7 días.</p></div>';}
   else{
