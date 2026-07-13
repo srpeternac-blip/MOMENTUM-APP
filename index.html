@@ -238,8 +238,9 @@ body.rzing *{cursor:col-resize!important}
 .ct-name{font-size:13px}
 .ct-btn{background:var(--blue-bg2);border:1px solid var(--blue-line);color:var(--ink3);border-radius:6px;padding:2px 7px;font-size:11px;white-space:nowrap;cursor:default;min-width:24px;text-align:center;display:inline-block}
 .alert-wrap{position:relative;display:inline-block}
-.alert-wrap .ct-tip{display:none;position:absolute;right:-8px;bottom:calc(100% + 9px);background:#1c2733;border:1px solid var(--blue);border-radius:9px;padding:9px 13px;font-size:12.5px;font-family:var(--sans);color:#e8eef5;white-space:normal;width:max-content;max-width:260px;min-width:120px;z-index:80;box-shadow:0 10px 30px rgba(0,0,0,.7);text-align:center;line-height:1.45}
-.alert-wrap .ct-tip::after{content:'';position:absolute;right:16px;top:100%;border:6px solid transparent;border-top-color:var(--blue)}
+.alert-wrap .ct-tip{display:none;position:absolute;right:-8px;bottom:calc(100% + 10px);background:#e9f1fa;border:1px solid var(--blue);border-radius:10px;padding:10px 14px;font-size:12.5px;font-family:var(--sans);color:#16202b;font-weight:500;white-space:normal;width:max-content;max-width:270px;min-width:130px;z-index:90;box-shadow:0 12px 32px rgba(0,0,0,.65);text-align:center;line-height:1.5}
+.alert-wrap .ct-tip b{color:#0d1520}
+.alert-wrap .ct-tip::after{content:'';position:absolute;right:16px;top:100%;border:7px solid transparent;border-top-color:#e9f1fa}
 .alert-wrap:hover .ct-tip{display:block}
 .ct-btn:hover{color:var(--ink);border-color:var(--ink3)}
 .ct-btn.lit-e{color:var(--amber);border-color:var(--amber);font-weight:600}
@@ -248,9 +249,7 @@ body.rzing *{cursor:col-resize!important}
 .ct-btn:disabled{opacity:.35;cursor:default}
 .ct-panel{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;margin:4px 0 8px}
 .alert-wrap{position:relative}
-.ct-tip{display:none;position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);z-index:30;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13px;width:330px;box-shadow:0 8px 24px rgba(0,0,0,.5);line-height:1.5}
-.alert-wrap:hover .ct-tip{display:block}
-@media(max-width:980px){.ct-tip{left:auto;right:0;top:calc(100% + 6px);transform:none}}
+
 .cart-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
 .rep-h{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin:12px 0 6px}
 .rep-h:first-child{margin-top:0}
@@ -259,6 +258,7 @@ body.rzing *{cursor:col-resize!important}
 .bar-row span:first-child{color:var(--amber);font-weight:600;width:64px}
 .ct-peso{font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:700;text-align:right}
 .ct-mov{font-family:var(--mono);font-size:12.5px;font-weight:600;text-align:right}
+.ct-mov .pre{opacity:.55;font-style:italic}
 .ct-inv{font-family:var(--mono);font-size:12.5px;color:var(--ink2);text-align:right}
 .ct-pl{font-family:var(--mono);font-size:12.5px;font-weight:600;text-align:right;white-space:nowrap}
 .ct-pl b{font-weight:700}
@@ -299,7 +299,7 @@ body.rzing *{cursor:col-resize!important}
 .side-card h3{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin:0 0 10px}
 @media(max-width:1000px){.cart-grid{grid-template-columns:1fr}#sectorSide{position:static;max-height:none}}
 .ct-head{border-bottom:2px solid var(--blue-line)!important;padding:10px 6px!important;background:rgba(143,184,221,.07);margin:0 -14px 2px;padding-left:20px!important;padding-right:20px!important;border-radius:0 10px 0 0}
-.ct-head .ct-h{border-right:1px solid rgba(143,184,221,.22);margin-right:-1px}
+.ct-head .ct-h{border-right:1px solid rgba(143,184,221,.22);margin-right:-1px;text-align:center}
 .ct-head .ct-h:last-child{border-right:none}
 .ct-h{cursor:pointer;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;user-select:none;flex:none}
 .ct-h:hover{color:var(--amber)}
@@ -1721,17 +1721,21 @@ async function loadPrimasOpciones(){
   });
   if(nuevas)renderCartera();
 }
-const MKT=[{n:'S&P 500',s:'^GSPC'},{n:'Nasdaq',s:'^IXIC'},{n:'Russell',s:'^RUT'},{n:'VIX',s:'^VIX'},{n:'Oro',s:'GC=F'},{n:'WTI',s:'CL=F'},{n:'Bitcoin',s:'BTC-USD'}];
+const MKT=[{n:'S&P fut',s:'ES=F'},{n:'Nasdaq fut',s:'NQ=F'},{n:'Russell fut',s:'RTY=F'},{n:'VIX',s:'^VIX'},{n:'Oro',s:'GC=F'},{n:'WTI',s:'CL=F'},{n:'Bitcoin',s:'BTC-USD'}];
 async function loadMercado(){
   const el=$('#mktBar');if(!el||!workerUrl)return;
   try{
-    const res=await Promise.all(MKT.map(x=>api('/chart/'+encodeURIComponent(x.s)+'?range=5d&interval=1d')
-      .then(j=>{const c=parseChart(j).rows.map(r=>r.c).filter(v=>v!=null);
-        if(c.length<2)return{...x,v:null,d:null};
-        return{...x,v:c[c.length-1],d:(c[c.length-1]-c[c.length-2])/c[c.length-2]};})
+    const res=await Promise.all(MKT.map(x=>api('/chart/'+encodeURIComponent(x.s)+'?range=1d&interval=5m')
+      .then(j=>{
+        const r0=j?.chart?.result?.[0],meta=r0?.meta||{};
+        const cl=(r0?.indicators?.quote?.[0]?.close||[]).filter(v=>v!=null);
+        const last=cl.length?cl[cl.length-1]:(meta.regularMarketPrice??null);
+        const prev=meta.chartPreviousClose??meta.previousClose??null;
+        if(last==null||!prev)return{...x,v:null,d:null};
+        return{...x,v:last,d:(last-prev)/prev};})
       .catch(()=>({...x,v:null,d:null}))));
     el.innerHTML=res.map(x=>{
-      const val=x.v==null?'—':(x.s==='BTC-USD'||x.s==='^GSPC'||x.s==='^IXIC'||x.s==='^RUT')?Math.round(x.v).toLocaleString('es-ES'):x.v.toFixed(2);
+      const val=x.v==null?'—':(x.s==='BTC-USD'||x.s==='ES=F'||x.s==='NQ=F'||x.s==='RTY=F')?Math.round(x.v).toLocaleString('es-ES'):x.v.toFixed(2);
       const cls=(x.d??0)>=0?'pos':'neg';
       return `<div class="mkt-i"><div class="mn">${esc(x.n)}</div><div class="mc ${cls}">${x.d==null?'—':((x.d>0?'+':'')+(x.d*100).toFixed(2)+'%')}</div><div class="mv">${val}</div></div>`;
     }).join('');
@@ -1762,13 +1766,15 @@ function renderCartera(){
   if(sheetOk){
     let list=activePort==='ALL'?posiciones:posiciones.filter(p=>p.port===activePort);
     const plDe=(p)=>{const v=plVivo(p);return{pct:v?v.pct:p.plPct,eur:v?v.eur:p.pl,vivo:!!v};};
-    const val=(p)=>({peso:p.peso,ticker:p.t,name:p.name,mov:(carteraMetrics[p.t]||{}).chg1,inv:p.inv,pl:plDe(p).pct,port:p.port})[ctSort.col];
+    const val=(p)=>({peso:p.peso,tick:p.t,name:p.name,mov:((carteraMetrics[p.t]||{}).chgLive??(carteraMetrics[p.t]||{}).chg1),inv:p.inv,pl:plDe(p).pct})[ctSort.col];
     list=sortear(list,val);
     const head=`<div class="ct-row ct-head"><div class="ct-data">`+
       hd('peso','Peso')+hd('tick','Ticker')+hd('name','Nombre')+hd('mov','Hoy')+hd('inv','Invertido')+hd('pl','P&L')+
       `</div>${fantasma}</div>`;
     $('#carteraBody').innerHTML=head+list.map(p=>{
-      const t=p.t,mov=(carteraMetrics[t]||{}).chg1,q=plDe(p);
+      const t=p.t,mm=carteraMetrics[p.t]||{},q=plDe(p);
+      const mov=mm.chgLive??mm.chg1;
+      const movHtml=mov==null?'—':`<span class="${mov>=0?'pos':'neg'}${mm.isPre?' pre':''}"${mm.isPre?' title="Premarket — la sesión aún no ha abierto"':''}>${(mov>0?'+':'')+(mov*100).toFixed(1)}%${mm.isPre?'<sup style="font-size:8px"> pm</sup>':''}</span>`;
       let tip='';
       if(p.port==='OPCIONES'){
         const v=plVivo(p);
@@ -1780,7 +1786,7 @@ function renderCartera(){
           <span class="ct-peso cw cw-peso">${p.peso!=null?(p.peso*100).toFixed(1)+'%':'—'}</span>
           <span class="ct-tick cw cw-tick" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(t)}</span>
           <span class="ct-name cw cw-name" data-go="analisis" data-tk="${esc(t)}" style="cursor:pointer">${esc(p.name)}</span>
-          <span class="ct-mov cw cw-mov">${fPct(mov)}</span>
+          <span class="ct-mov cw cw-mov">${movHtml}</span>
           <span class="ct-inv cw cw-inv">${p.inv!=null?Math.round(p.inv).toLocaleString('es-ES'):'—'}</span>
           <span class="ct-pl cw cw-pl"${tip}>${fEur(q.eur)} ${fPct(q.pct)}${p.port==='OPCIONES'&&!q.vivo?'<span style="color:var(--warn);font-size:10px">*</span>':''}</span>
         </div>
@@ -1890,11 +1896,18 @@ function renderSectorSide(){
   const iEl=$('#sideInsiders');
   if(iEl){
     const keys=Object.keys(tradesByTicker).filter(t=>tset.has(t));
-    iEl.innerHTML='<h3>Insiders</h3>'+(keys.length?
-      keys.map(t=>{const x=tradesByTicker[t][0];
-        return `<div class="rep-li"><b style="font-family:var(--mono);color:var(--blue)">${esc(t)}</b> <span class="${x.isSale?'neg':'pos'}">${x.isSale?'venta':'compra'} ${esc(x.valueStr||'')}</span></div>`;
-      }).join('')
-      :'<div class="sub-line">Sin movimientos.</div>');
+    const rec=keys.filter(t=>tradesByTicker[t].some(x=>x.en7d));
+    const linea=(t,x,conFecha)=>`<div class="rep-li"><b style="font-family:var(--mono);color:var(--blue)">${esc(t)}</b> <span class="${x.isSale?'neg':'pos'}">${x.isSale?'venta':'compra'} ${esc(x.valueStr||'')}</span>${conFecha?` <span style="color:var(--ink3);font-size:11px">${esc(x.date.slice(0,5))}</span>`:''}</div>`;
+    let inner;
+    if(rec.length){
+      inner=rec.map(t=>linea(t,tradesByTicker[t].filter(x=>x.en7d)[0],false)).join('');
+    }else if(keys.length){
+      const ult=keys.map(t=>({t,x:tradesByTicker[t][0]})).sort((a,b)=>a.x.diff-b.x.diff).slice(0,6);
+      inner='<div class="sub-line" style="margin-bottom:6px">Nada en 7 días. Últimos 30:</div>'+ult.map(({t,x})=>linea(t,x,true)).join('');
+    }else{
+      inner='<div class="sub-line">Sin movimientos.</div>';
+    }
+    iEl.innerHTML='<h3>Insiders</h3>'+inner;
   }
 }
 let activePort=localStorage.getItem('pit_cartera_filter')||'ALL';
@@ -1964,6 +1977,24 @@ async function scanAlerts(){
       const chg=perf(cl,1),v20=sma(vl,20);
       const volX=(v20&&vl[vl.length-1])?vl[vl.length-1]/v20:null;
       carteraMetrics[c.yahooTicker]={chg1:chg,chg5:perf(cl,5),volX};
+      // Precio en vivo / premarket (intradía con pre-post)
+      try{
+        const j2=await api('/chart/'+encodeURIComponent(c.yahooTicker)+'?range=1d&interval=5m');
+        const r2=j2?.chart?.result?.[0],meta=r2?.meta||{};
+        const q2=r2?.indicators?.quote?.[0]||{};
+        const ts=r2?.timestamp||[];
+        let li=-1;for(let i=(q2.close||[]).length-1;i>=0;i--){if(q2.close[i]!=null){li=i;break;}}
+        const prev=meta.chartPreviousClose??meta.previousClose;
+        if(li>=0&&prev){
+          const lastTs=ts[li],reg=meta.currentTradingPeriod?.regular,pre=meta.currentTradingPeriod?.pre;
+          const enPre=pre&&reg&&lastTs>=pre.start&&lastTs<reg.start;
+          const enSesion=reg&&lastTs>=reg.start&&lastTs<=reg.end;
+          if(enPre||enSesion){
+            carteraMetrics[c.yahooTicker].chgLive=(q2.close[li]-prev)/prev;
+            carteraMetrics[c.yahooTicker].isPre=!!enPre;
+          }
+        }
+      }catch(e){}
       const reasons=[];
       if(chg!=null&&Math.abs(chg)>=0.06)reasons.push(`Movimiento fuerte en la última sesión: <b class="${chg>=0?'pos':'neg'}">${(chg>0?'+':'')+pct(chg,1)}</b>`);
       if(volX!=null&&volX>=2.5)reasons.push(`Volumen inusual: <b>${volX.toFixed(1)}×</b> su media de 20 sesiones — posible dinero grande moviéndose`);
@@ -2035,7 +2066,7 @@ async function fetchInsidersCartera(isBg=false){
   const btn=$('#btnInsiders');if(!isBg){btn.disabled=true;btn.textContent='⏳ Conectando…';}
   const usT=companies.filter(c=>!c.yahooTicker.includes('.'));
   const container=$('#insidersContainer');
-  tradesByTicker={};let total=0;const maxDays=7,nowMs=Date.now();
+  tradesByTicker={};let total=0;const maxDays=30,nowMs=Date.now();
   await pool(usT,6,async(comp)=>{
     try{
       const json=await fetchNasdaq(`company/${base(comp.yahooTicker).toLowerCase()}/insider-trades?limit=50&type=ALL`);
@@ -2046,6 +2077,7 @@ async function fetchInsidersCartera(isBg=false){
         const dp=row.lastDate.split('/');if(dp.length!==3)return;
         const rd=new Date(`${dp[2]}-${dp[0]}-${dp[1]}`);
         const diff=(nowMs-rd.getTime())/86400000;if(diff>maxDays||diff<0)return;
+        const en7d=diff<=7;
         const type=row.transactionType.toLowerCase();
         const isSale=type.includes('sell')||type.includes('sale');
         const isBuy=type.includes('buy')||type.includes('purchase');
@@ -2057,12 +2089,12 @@ async function fetchInsidersCartera(isBg=false){
         let relevance='Media',relColor='var(--warn)';
         if(v>=100000){relevance='Considerable';relColor='var(--amber)';}
         else if(v<10000){relevance='Ridícula';relColor='var(--ink3)';}
-        valid.push({date:`${dp[1].padStart(2,'0')}/${dp[0].padStart(2,'0')}/${dp[2]}`,insider:row.insider||'Desconocido',title:row.relation||'—',isSale,price:row.lastPrice?'$'+row.lastPrice:'—',qty:row.sharesTraded||'—',valueNum:v,valueStr:'$'+v.toLocaleString('en-US',{maximumFractionDigits:0}),relevance,relColor});
+        valid.push({date:`${dp[1].padStart(2,'0')}/${dp[0].padStart(2,'0')}/${dp[2]}`,en7d,diff,insider:row.insider||'Desconocido',title:row.relation||'—',isSale,price:row.lastPrice?'$'+row.lastPrice:'—',qty:row.sharesTraded||'—',valueNum:v,valueStr:'$'+v.toLocaleString('en-US',{maximumFractionDigits:0}),relevance,relColor});
       });
       if(valid.length){tradesByTicker[comp.yahooTicker]=valid.sort((a,b)=>b.valueNum-a.valueNum);total+=valid.length;}
     }catch(e){}
   });
-  insiderAlerts=new Set(Object.keys(tradesByTicker));
+  insiderAlerts=new Set(Object.keys(tradesByTicker).filter(t=>tradesByTicker[t].some(x=>x.en7d)));
   renderCartera();
   if(!Object.keys(tradesByTicker).length){container.innerHTML='<div class="card"><p class="sub-line">No hay operaciones >$1.000 en los últimos 7 días.</p></div>';}
   else{
